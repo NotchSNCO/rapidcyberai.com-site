@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RapidCyberAI - Training Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #0b0f19;
+      color: #ffffff;
+      text-align: center;
+      padding: 40px;
+    }
+    h1 {
+      color: #00ffc3;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+    }
+    .lab-link {
+      display: block;
+      margin: 10px 0;
+      padding: 15px;
+      background: #111827;
+      border-radius: 8px;
+      text-decoration: none;
+      color: white;
+      transition: 0.2s;
+    }
+    .lab-link:hover {
+      background: #1f2937;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>RapidCyberAI Training Portal</h1>
+    <p>Select a lab to begin:</p>
+
+    <a class="lab-link" href="Week0_Environment_Setup_Lab.html">Week 0 - Environment Setup</a>
+    <a class="lab-link" href="Week1_Labs.html">Week 1 - Labs</a>
+    <a class="lab-link" href="Week2_Labs.html">Week 2 - Labs</a>
+    <a class="lab-link" href="Week3_Labs.html">Week 3 - Labs</a>
+    <a class="lab-link" href="Week4_Labs.html">Week 4 - Labs</a>
+    <a class="lab-link" href="Week5_Labs.html">Week 5 - Labs</a>
+    <a class="lab-link" href="Week6_Labs.html">Week 6 - Labs</a>
+    <a class="lab-link" href="Week7_Labs.html">Week 7 - Labs</a>
+    <a class="lab-link" href="Week8_Labs.html">Week 8 - Labs</a>
+
+  </div>
+</body>
+</html>

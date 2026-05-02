@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Week 1: AWS Security Fundamentals — RAPID CYBER AI</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root { --blood: #8B0000; --crimson: #DC143C; --scarlet: #FF2D2D; --void: #0A0A0A; --carbon: #111; --steel: #1A1A1A; --ash: #222; --smoke: #888; --bone: #CCC; --text: #E0E0E0; --white: #F5F5F5; --accent: #00D4AA; --warn: #F59E0B; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'DM Sans', sans-serif; background: var(--void); color: var(--text); line-height: 1.7; }
+.header { background: var(--carbon); border-bottom: 2px solid var(--blood); padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand svg { width: 32px; height: 32px; }
+.brand span { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: var(--crimson); letter-spacing: 2px; }
+.header-meta { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--smoke); letter-spacing: 1px; }
+.progress-wrap { width: 100%; background: var(--ash); height: 3px; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--blood), var(--crimson)); width: 0%; transition: width 0.6s ease; }
+.progress-text { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--smoke); text-align: center; padding: 6px 0; background: var(--carbon); border-bottom: 1px solid var(--ash); }
+.container { max-width: 880px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+.hero { text-align: center; padding: 2.5rem 0; border-bottom: 1px solid var(--ash); margin-bottom: 2rem; }
+.hero-badge { display: inline-block; padding: 4px 14px; border: 1px solid var(--blood); border-radius: 20px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--crimson); letter-spacing: 2px; margin-bottom: 0.75rem; }
+.hero h1 { font-family: 'JetBrains Mono', monospace; font-size: 26px; color: var(--white); font-weight: 700; margin-bottom: 0.5rem; }
+.hero h1 span { color: var(--crimson); }
+.hero .sub { font-size: 14px; color: var(--smoke); }
+.hero .time { display: inline-flex; align-items: center; gap: 6px; margin-top: 0.75rem; padding: 6px 16px; background: var(--steel); border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--bone); }
+.hero .time .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--crimson); }
+.section-nav { display: flex; gap: 4px; margin-bottom: 2rem; flex-wrap: wrap; background: var(--carbon); padding: 6px; border-radius: 6px; border: 1px solid var(--ash); }
+.sec-tab { flex: 1; min-width: 80px; padding: 8px 8px; background: transparent; border: none; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--smoke); cursor: pointer; transition: all 0.2s; letter-spacing: 0.5px; text-align: center; }
+.sec-tab:hover { background: var(--steel); color: var(--bone); }
+.sec-tab.active { background: var(--blood); color: white; }
+.sec-tab .tab-check { display: inline-block; margin-right: 3px; opacity: 0; transition: opacity 0.3s; }
+.sec-tab.completed .tab-check { opacity: 1; color: var(--accent); }
+.section-content { display: none; animation: fadeIn 0.3s ease; }
+.section-content.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.section-header { margin-bottom: 1.5rem; }
+.section-header h2 { font-family: 'JetBrains Mono', monospace; font-size: 18px; color: var(--crimson); font-weight: 700; margin-bottom: 0.25rem; }
+.section-header .meta { font-size: 13px; color: var(--smoke); }
+.step { margin-bottom: 1.75rem; border-left: 2px solid var(--ash); padding-left: 1.25rem; position: relative; transition: all 0.3s; }
+.step::before { content: ''; position: absolute; left: -6px; top: 6px; width: 10px; height: 10px; background: var(--blood); border-radius: 50%; border: 2px solid var(--void); transition: all 0.3s; }
+.step.completed { border-left-color: var(--accent); }
+.step.completed::before { background: var(--accent); }
+.step h3 { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--bone); font-weight: 600; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 8px; }
+.step-check { width: 20px; height: 20px; border: 1.5px solid var(--ash); border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; font-size: 12px; color: transparent; user-select: none; }
+.step-check:hover { border-color: var(--crimson); }
+.step-check.done { background: var(--accent); border-color: var(--accent); color: var(--void); }
+.step p { font-size: 13px; color: var(--smoke); margin-bottom: 0.5rem; }
+.code-block { background: var(--void); border: 1px solid var(--ash); border-radius: 6px; margin: 0.75rem 0; position: relative; overflow: hidden; }
+.code-header { display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; background: var(--steel); border-bottom: 1px solid var(--ash); }
+.code-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--smoke); letter-spacing: 1px; }
+.copy-btn { background: var(--ash); border: 1px solid #333; color: var(--smoke); font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 2px 10px; border-radius: 3px; cursor: pointer; transition: all 0.2s; letter-spacing: 1px; }
+.copy-btn:hover { background: var(--blood); border-color: var(--blood); color: white; }
+.copy-btn.copied { background: var(--accent); border-color: var(--accent); color: var(--void); }
+.code-body { padding: 0.75rem 1rem; overflow-x: auto; }
+.code-body pre { font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.8; white-space: pre-wrap; word-break: break-word; }
+.pr { color: var(--crimson); } .cmd { color: #E2E8F0; } .cm { color: #555; }
+.callout { border-left: 3px solid; border-radius: 0 6px 6px 0; padding: 0.9rem 1rem; margin: 0.75rem 0; }
+.callout .cl-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 2px; font-weight: 700; margin-bottom: 0.25rem; }
+.callout p { font-size: 12px; margin-bottom: 0; }
+.callout-warn { background: #1A1400; border-color: var(--warn); }
+.callout-warn .cl-label { color: var(--warn); }
+.nav-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 2rem; border-top: 1px solid var(--ash); margin-top: 2rem; }
+.nav-btn { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--steel); border: 1px solid var(--ash); border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--bone); cursor: pointer; transition: all 0.2s; text-decoration: none; letter-spacing: 1px; }
+.nav-btn:hover { border-color: var(--crimson); color: var(--crimson); }
+.nav-btn.primary { background: var(--blood); border-color: var(--blood); color: white; }
+.nav-btn.primary:hover { background: var(--crimson); border-color: var(--crimson); }
+@media (max-width: 640px) { .container { padding: 1rem; } .section-nav { flex-direction: column; } .hero h1 { font-size: 20px; } }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="brand">
+    <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><path d="M28 4 L52 16 L52 40 L28 52 L4 40 L4 16 Z" fill="none" stroke="#DC143C" stroke-width="2"/><path d="M28 8 L48 18 L48 38 L28 48 L8 38 L8 18 Z" fill="#8B0000" opacity="0.3"/><circle cx="28" cy="20" r="3" fill="#DC143C"/><circle cx="20" cy="30" r="2.5" fill="#DC143C" opacity="0.7"/><circle cx="36" cy="30" r="2.5" fill="#DC143C" opacity="0.7"/><circle cx="28" cy="37" r="2.5" fill="#DC143C" opacity="0.8"/><line x1="28" y1="20" x2="20" y2="30" stroke="#DC143C" stroke-width="0.7" opacity="0.4"/><line x1="28" y1="20" x2="36" y2="30" stroke="#DC143C" stroke-width="0.7" opacity="0.4"/><line x1="20" y1="30" x2="28" y2="37" stroke="#DC143C" stroke-width="0.7" opacity="0.4"/><line x1="36" y1="30" x2="28" y2="37" stroke="#DC143C" stroke-width="0.7" opacity="0.4"/><rect x="24" y="42" width="8" height="2" fill="#DC143C" opacity="0.8"/></svg>
+    <span>RAPID CYBER AI</span>
+  </div>
+  <span class="header-meta">WEEK 1 OF 8</span>
+</div>
+<div class="progress-wrap"><div class="progress-fill" id="progressFill"></div></div>
+<div class="progress-text" id="progressText">0 steps completed</div>
+<div class="container">
+  <div class="hero">
+    <div class="hero-badge">WEEK 1</div>
+    <h1><span>AWS Security Fundamentals</span></h1>
+    <p class="sub">Build a production-grade AWS security foundation from scratch</p>
+    <div class="time"><span class="dot"></span> 8-10 hours</div>
+  </div>
+  <div class="section-nav" id="sectionNav">
+    <button class="sec-tab active" data-sec="iam"><span class="tab-check">✓</span>IAM HARDENING</button>
+    <button class="sec-tab " data-sec="vpc"><span class="tab-check">✓</span>VPC</button>
+    <button class="sec-tab " data-sec="ct"><span class="tab-check">✓</span>CLOUDTRAIL</button>
+    <button class="sec-tab " data-sec="gd"><span class="tab-check">✓</span>GUARDDUTY</button>
+    <button class="sec-tab " data-sec="audit"><span class="tab-check">✓</span>AUDIT</button>
+  </div>
+
+  <div class="section-content active" id="sec-iam">
+    <div class="section-header">
+      <h2>Lab 1: IAM Hardening</h2>
+      <div class="meta">~90 minutes // Least-privilege policies, MFA, Access Analyzer, permissions boundaries</div>
+    </div>
+    
+    <div class="step" data-section="iam">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Create a least-privilege IAM policy</h3>
+      <p>Create a custom policy scoped to EC2/VPC actions in us-east-1 only. This region lock prevents compromised credentials from being used in unmonitored regions.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">bootcamp-policy.json</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">cat &gt; bootcamp-policy.json &lt;&lt; 'EOF'</span>
+<span class="cmd">{</span>
+<span class="cmd">  "Version": "2012-10-17",</span>
+<span class="cmd">  "Statement": [</span>
+<span class="cmd">    {</span>
+<span class="cmd">      "Sid": "EC2VPCAccess",</span>
+<span class="cmd">      "Effect": "Allow",</span>
+<span class="cmd">      "Action": [</span>
+<span class="cmd">        "ec2:Describe*", "ec2:Create*", "ec2:Delete*",</span>
+<span class="cmd">        "ec2:AuthorizeSecurityGroupIngress",</span>
+<span class="cmd">        "ec2:RevokeSecurityGroupIngress"</span>
+<span class="cmd">      ],</span>
+<span class="cmd">      "Resource": "*",</span>
+<span class="cmd">      "Condition": {</span>
+<span class="cmd">        "StringEquals": {"aws:RequestedRegion": "us-east-1"}</span>
+<span class="cmd">      }</span>
+<span class="cmd">    }</span>
+<span class="cmd">  ]</span>
+<span class="cmd">}</span>
+<span class="cmd">EOF</span></pre></div>
+      </div>
+      <div class="callout callout-warn">
+        <div class="cl-label">WHY THIS MATTERS</div>
+        <p>IAM misconfigurations are the #1 root cause of AWS breaches. The Capital One breach? Overly permissive IAM role. Getting IAM right is the single most impactful thing you can do.</p>
+      </div>
+    </div>
+    <div class="step" data-section="iam">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Create the policy in AWS</h3>
+      <p>Run this command and save the ARN from the output — you'll need it next.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Create policy</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">aws iam create-policy \</span>
+<span class="cmd">    --policy-name BootcampLabPolicy \</span>
+<span class="cmd">    --policy-document file://bootcamp-policy.json \</span>
+<span class="cmd">    --description 'Scoped policy for Cloud Security Bootcamp labs'</span>
+<span class="cmd"></span>
+<span class="cm"># Save the ARN from output:</span>
+<span class="cm"># arn:aws:iam::ACCOUNT_ID:policy/BootcampLabPolicy</span></pre></div>
+      </div>
+    </div>
+    <div class="step" data-section="iam">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Create a dedicated IAM user</h3>
+      <p>Never run labs with admin credentials. Create a scoped user and configure a separate CLI profile.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Scoped user</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">aws iam create-user --user-name bootcamp-student</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">aws iam attach-user-policy \</span>
+<span class="cmd">    --user-name bootcamp-student \</span>
+<span class="cmd">    --policy-arn arn:aws:iam::ACCOUNT_ID:policy/BootcampLabPolicy</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">aws iam create-access-key --user-name bootcamp-student</span>
+<span class="cmd"></span>
+<span class="cm"># Configure new CLI profile:</span>
+<span class="pr">$</span> <span class="cmd">aws configure --profile bootcamp</span></pre></div>
+      </div>
+    </div>
+    <div class="step" data-section="iam">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Enable MFA on root account</h3>
+      <p>Go to IAM > Security credentials > Assign MFA device. Use Google Authenticator or Authy. This is one of the few steps requiring the AWS Console.</p>
+      <div class="callout callout-warn">
+        <div class="cl-label">WHY THIS MATTERS</div>
+        <p>If root is compromised without MFA, the attacker owns your entire AWS organization — unlimited access, unlimited charges.</p>
+      </div>
+    </div>
+    <div class="step" data-section="iam">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Set up IAM Access Analyzer</h3>
+      <p>Continuously monitors your account for overly permissive access.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Access Analyzer</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">aws accessanalyzer create-analyzer \</span>
+<span class="cmd">    --analyzer-name bootcamp-analyzer \</span>
+<span class="cmd">    --type ACCOUNT</span>
+<span class="cmd"></span>
+<span class="cm"># List findings:</span>
+<span class="pr">$</span> <span class="cmd">aws accessanalyzer list-findings \</span>
+<span class="cmd">    --analyzer-arn $(aws accessanalyzer list-analyzers \</span>
+<span class="cmd">      --query 'analyzers[0].arn' --output text)</span></pre></div>
+      </div>
+    </div>
+    <div class="step" data-section="iam">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Create a permissions boundary</h3>
+      <p>Prevents privilege escalation — even if someone modifies their own policy, the boundary caps what they can execute.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Boundary policy</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">cat &gt; boundary-policy.json &lt;&lt; 'EOF'</span>
+<span class="cmd">{</span>
+<span class="cmd">  "Version": "2012-10-17",</span>
+<span class="cmd">  "Statement": [</span>
+<span class="cmd">    {</span>
+<span class="cmd">      "Effect": "Allow",</span>
+<span class="cmd">      "Action": ["ec2:*", "s3:*", "cloudtrail:*",</span>
+<span class="cmd">                 "guardduty:*", "config:*", "logs:*"],</span>
+<span class="cmd">      "Resource": "*",</span>
+<span class="cmd">      "Condition": {</span>
+<span class="cmd">        "StringEquals": {"aws:RequestedRegion": "us-east-1"}</span>
+<span class="cmd">      }</span>
+<span class="cmd">    },</span>
+<span class="cmd">    {</span>
+<span class="cmd">      "Effect": "Deny",</span>
+<span class="cmd">      "Action": ["iam:CreateUser", "iam:DeleteUser",</span>
+<span class="cmd">                 "iam:AttachUserPolicy", "organizations:*"],</span>
+<span class="cmd">      "Resource": "*"</span>
+<span class="cmd">    }</span>
+<span class="cmd">  ]</span>
+<span class="cmd">}</span>
+<span class="cmd">EOF</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">aws iam create-policy \</span>
+<span class="cmd">    --policy-name BootcampBoundary \</span>
+<span class="cmd">    --policy-document file://boundary-policy.json</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">aws iam put-user-permissions-boundary \</span>
+<span class="cmd">    --user-name bootcamp-student \</span>
+<span class="cmd">    --permissions-boundary arn:aws:iam::ACCOUNT_ID:policy/BootcampBoundary</span></pre></div>
+      </div>
+    </div>
+    <div class="step" data-section="iam">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Verify — test the boundary</h3>
+      <p>Confirm allowed actions succeed and denied actions fail.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Verification</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="cm"># This should SUCCEED:</span>
+<span class="pr">$</span> <span class="cmd">aws ec2 describe-vpcs --profile bootcamp</span>
+<span class="cmd"></span>
+<span class="cm"># This should FAIL (boundary blocks it):</span>
+<span class="pr">$</span> <span class="cmd">aws iam create-user --user-name test-escalation --profile bootcamp</span>
+<span class="cm"># Expected: AccessDenied</span></pre></div>
+      </div>
+    </div>
+    <div class="nav-footer">
+      <div></div>
+      <button class="nav-btn primary" onclick="goToSection('vpc')">NEXT LAB →</button>
+    </div>
+  </div>
+  <div class="section-content " id="sec-vpc">
+    <div class="section-header">
+      <h2>Lab 2: VPC Architecture</h2>
+      <div class="meta">~90 minutes // Production VPC, public/private subnets, security groups, flow logs</div>
+    </div>
+    
+    <div class="step" data-section="vpc">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Create the VPC</h3>
+      <p>Create a /16 VPC with DNS support. Tag everything at creation time — untagged resources are audit red flags.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">VPC creation</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">VPC_ID=$(aws ec2 create-vpc \</span>
+<span class="cmd">    --cidr-block 10.0.0.0/16 \</span>
+<span class="cmd">    --tag-specifications 'ResourceType=vpc,Tags=[{Key=Name,Value=bootcamp-vpc},{Key=Environment,Value=lab}]' \</span>
+<span class="cmd">    --query 'Vpc.VpcId' --output text)</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">aws ec2 modify-vpc-attribute \</span>
+<span class="cmd">    --vpc-id $VPC_ID \</span>
+<span class="cmd">    --enable-dns-hostnames</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">echo "VPC ID: $VPC_ID"</span></pre></div>
+      </div>
+    </div>
+    <div class="step" data-section="vpc">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Create subnets (2 public + 2 private)</h3>
+      <p>Spread across two AZs for high availability. Use higher third-octet values for private subnets so you can visually distinguish them.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Subnets</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="cm"># Public subnets</span>
+<span class="pr">$</span> <span class="cmd">PUB_1A=$(aws ec2 create-subnet --vpc-id $VPC_ID \</span>
+<span class="cmd">    --cidr-block 10.0.1.0/24 --availability-zone us-east-1a \</span>
+<span class="cmd">    --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=public-1a}]' \</span>
+<span class="cmd">    --query 'Subnet.SubnetId' --output text)</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">PUB_1B=$(aws ec2 create-subnet --vpc-id $VPC_ID \</span>
+<span class="cmd">    --cidr-block 10.0.2.0/24 --availability-zone us-east-1b \</span>
+<span class="cmd">    --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=public-1b}]' \</span>
+<span class="cmd">    --query 'Subnet.SubnetId' --output text)</span>
+<span class="cmd"></span>
+<span class="cm"># Private subnets</span>
+<span class="pr">$</span> <span class="cmd">PRIV_1A=$(aws ec2 create-subnet --vpc-id $VPC_ID \</span>
+<span class="cmd">    --cidr-block 10.0.10.0/24 --availability-zone us-east-1a \</span>
+<span class="cmd">    --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=private-1a}]' \</span>
+<span class="cmd">    --query 'Subnet.SubnetId' --output text)</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">PRIV_1B=$(aws ec2 create-subnet --vpc-id $VPC_ID \</span>
+<span class="cmd">    --cidr-block 10.0.11.0/24 --availability-zone us-east-1b \</span>
+<span class="cmd">    --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=private-1b}]' \</span>
+<span class="cmd">    --query 'Subnet.SubnetId' --output text)</span></pre></div>
+      </div>
+    </div>
+    <div class="step" data-section="vpc">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Internet Gateway + NAT Gateway</h3>
+      <p>IGW for public subnets. NAT Gateway gives private subnets outbound-only internet access.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Gateways</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">IGW_ID=$(aws ec2 create-internet-gateway \</span>
+<span class="cmd">    --query 'InternetGateway.InternetGatewayId' --output text)</span>
+<span class="pr">$</span> <span class="cmd">aws ec2 attach-internet-gateway \</span>
+<span class="cmd">    --internet-gateway-id $IGW_ID --vpc-id $VPC_ID</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">EIP_ID=$(aws ec2 allocate-address --domain vpc \</span>
+<span class="cmd">    --query 'AllocationId' --output text)</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">NAT_ID=$(aws ec2 create-nat-gateway \</span>
+<span class="cmd">    --subnet-id $PUB_1A --allocation-id $EIP_ID \</span>
+<span class="cmd">    --query 'NatGateway.NatGatewayId' --output text)</span>
+<span class="cmd"></span>
+<span class="cm"># Wait ~2 min for NAT Gateway</span>
+<span class="pr">$</span> <span class="cmd">aws ec2 wait nat-gateway-available --nat-gateway-ids $NAT_ID</span></pre></div>
+      </div>
+      <div class="callout callout-warn">
+        <div class="cl-label">WHY THIS MATTERS</div>
+        <p>NAT Gateways cost ~$0.045/hr ($32/mo). Delete when not labbing. Private subnets can reach the internet for updates but block all inbound connections — your databases and app servers live here.</p>
+      </div>
+    </div>
+    <div class="step" data-section="vpc">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Route tables</h3>
+      <p>Public route table → IGW. Private route table → NAT Gateway. Without these associations, subnets don't function as public or private.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Routes</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="cm"># Public route table</span>
+<span class="pr">$</span> <span class="cmd">PUB_RT=$(aws ec2 create-route-table --vpc-id $VPC_ID \</span>
+<span class="cmd">    --query 'RouteTable.RouteTableId' --output text)</span>
+<span class="pr">$</span> <span class="cmd">aws ec2 create-route --route-table-id $PUB_RT \</span>
+<span class="cmd">    --destination-cidr-block 0.0.0.0/0 --gateway-id $IGW_ID</span>
+<span class="pr">$</span> <span class="cmd">aws ec2 associate-route-table --route-table-id $PUB_RT --subnet-id $PUB_1A</span>
+<span class="pr">$</span> <span class="cmd">aws ec2 associate-route-table --route-table-id $PUB_RT --subnet-id $PUB_1B</span>
+<span class="cmd"></span>
+<span class="cm"># Private route table</span>
+<span class="pr">$</span> <span class="cmd">PRIV_RT=$(aws ec2 create-route-table --vpc-id $VPC_ID \</span>
+<span class="cmd">    --query 'RouteTable.RouteTableId' --output text)</span>
+<span class="pr">$</span> <span class="cmd">aws ec2 create-route --route-table-id $PRIV_RT \</span>
+<span class="cmd">    --destination-cidr-block 0.0.0.0/0 --nat-gateway-id $NAT_ID</span>
+<span class="pr">$</span> <span class="cmd">aws ec2 associate-route-table --route-table-id $PRIV_RT --subnet-id $PRIV_1A</span>
+<span class="pr">$</span> <span class="cmd">aws ec2 associate-route-table --route-table-id $PRIV_RT --subnet-id $PRIV_1B</span></pre></div>
+      </div>
+    </div>
+    <div class="step" data-section="vpc">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Security groups — 3-tier architecture</h3>
+      <p>Web tier: HTTPS + SSH from your IP. App tier: traffic only from web SG. DB tier: PostgreSQL only from app SG. Each layer only accepts traffic from the layer above it.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Security groups</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">MY_IP=$(curl -s https://checkip.amazonaws.com)/32</span>
+<span class="cmd"></span>
+<span class="cm"># Web tier</span>
+<span class="pr">$</span> <span class="cmd">WEB_SG=$(aws ec2 create-security-group --group-name web-tier \</span>
+<span class="cmd">    --description 'Web tier' --vpc-id $VPC_ID --query 'GroupId' --output text)</span>
+<span class="pr">$</span> <span class="cmd">aws ec2 authorize-security-group-ingress --group-id $WEB_SG \</span>
+<span class="cmd">    --protocol tcp --port 443 --cidr 0.0.0.0/0</span>
+<span class="pr">$</span> <span class="cmd">aws ec2 authorize-security-group-ingress --group-id $WEB_SG \</span>
+<span class="cmd">    --protocol tcp --port 22 --cidr $MY_IP</span>
+<span class="cmd"></span>
+<span class="cm"># App tier — only from web SG</span>
+<span class="pr">$</span> <span class="cmd">APP_SG=$(aws ec2 create-security-group --group-name app-tier \</span>
+<span class="cmd">    --description 'App tier' --vpc-id $VPC_ID --query 'GroupId' --output text)</span>
+<span class="pr">$</span> <span class="cmd">aws ec2 authorize-security-group-ingress --group-id $APP_SG \</span>
+<span class="cmd">    --protocol tcp --port 8080 --source-group $WEB_SG</span>
+<span class="cmd"></span>
+<span class="cm"># DB tier — only from app SG</span>
+<span class="pr">$</span> <span class="cmd">DB_SG=$(aws ec2 create-security-group --group-name db-tier \</span>
+<span class="cmd">    --description 'DB tier' --vpc-id $VPC_ID --query 'GroupId' --output text)</span>
+<span class="pr">$</span> <span class="cmd">aws ec2 authorize-security-group-ingress --group-id $DB_SG \</span>
+<span class="cmd">    --protocol tcp --port 5432 --source-group $APP_SG</span></pre></div>
+      </div>
+    </div>
+    <div class="step" data-section="vpc">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Enable VPC Flow Logs</h3>
+      <p>Capture REJECT traffic only — you see every blocked connection attempt without the noise and cost of logging all traffic.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Flow Logs</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">aws logs create-log-group \</span>
+<span class="cmd">    --log-group-name /vpc/bootcamp-flow-logs</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">aws ec2 create-flow-logs \</span>
+<span class="cmd">    --resource-type VPC \</span>
+<span class="cmd">    --resource-ids $VPC_ID \</span>
+<span class="cmd">    --traffic-type REJECT \</span>
+<span class="cmd">    --log-destination-type cloud-watch-logs \</span>
+<span class="cmd">    --log-group-name /vpc/bootcamp-flow-logs</span></pre></div>
+      </div>
+    </div>
+    <div class="nav-footer">
+      <button class="nav-btn" onclick="goToSection('iam')">← PREV LAB</button>
+      <button class="nav-btn primary" onclick="goToSection('ct')">NEXT LAB →</button>
+    </div>
+  </div>
+  <div class="section-content " id="sec-ct">
+    <div class="section-header">
+      <h2>Lab 3: CloudTrail & Logging</h2>
+      <div class="meta">~60 minutes // Audit trail, hardened S3 log bucket, tamper-proof validation</div>
+    </div>
+    
+    <div class="step" data-section="ct">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Create a hardened S3 log bucket</h3>
+      <p>Versioning prevents log deletion. Encryption protects data at rest. Public access block prevents accidental exposure.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Secure log bucket</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">ACCOUNT_ID=$(aws sts get-caller-identity --query 'Account' --output text)</span>
+<span class="pr">$</span> <span class="cmd">LOG_BUCKET="bootcamp-cloudtrail-logs-${ACCOUNT_ID}"</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">aws s3api create-bucket --bucket $LOG_BUCKET --region us-east-1</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">aws s3api put-bucket-versioning --bucket $LOG_BUCKET \</span>
+<span class="cmd">    --versioning-configuration Status=Enabled</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">aws s3api put-public-access-block --bucket $LOG_BUCKET \</span>
+<span class="cmd">    --public-access-block-configuration \</span>
+<span class="cmd">    "BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true"</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">aws s3api put-bucket-encryption --bucket $LOG_BUCKET \</span>
+<span class="cmd">    --server-side-encryption-configuration \</span>
+<span class="cmd">    '{"Rules":[{"ApplyServerSideEncryptionByDefault":{"SSEAlgorithm":"AES256"}}]}'</span></pre></div>
+      </div>
+    </div>
+    <div class="step" data-section="ct">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Apply bucket policy for CloudTrail</h3>
+      <p>CloudTrail needs GetBucketAcl (to verify ownership) and PutObject (to write logs).</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Bucket policy</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">cat &gt; trail-bucket-policy.json &lt;&lt; EOF</span>
+<span class="cmd">{</span>
+<span class="cmd">  "Version": "2012-10-17",</span>
+<span class="cmd">  "Statement": [</span>
+<span class="cmd">    {</span>
+<span class="cmd">      "Sid": "AWSCloudTrailAclCheck",</span>
+<span class="cmd">      "Effect": "Allow",</span>
+<span class="cmd">      "Principal": {"Service": "cloudtrail.amazonaws.com"},</span>
+<span class="cmd">      "Action": "s3:GetBucketAcl",</span>
+<span class="cmd">      "Resource": "arn:aws:s3:::${LOG_BUCKET}"</span>
+<span class="cmd">    },</span>
+<span class="cmd">    {</span>
+<span class="cmd">      "Sid": "AWSCloudTrailWrite",</span>
+<span class="cmd">      "Effect": "Allow",</span>
+<span class="cmd">      "Principal": {"Service": "cloudtrail.amazonaws.com"},</span>
+<span class="cmd">      "Action": "s3:PutObject",</span>
+<span class="cmd">      "Resource": "arn:aws:s3:::${LOG_BUCKET}/AWSLogs/*",</span>
+<span class="cmd">      "Condition": {</span>
+<span class="cmd">        "StringEquals": {"s3:x-amz-acl": "bucket-owner-full-control"}</span>
+<span class="cmd">      }</span>
+<span class="cmd">    }</span>
+<span class="cmd">  ]</span>
+<span class="cmd">}</span>
+<span class="cmd">EOF</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">aws s3api put-bucket-policy --bucket $LOG_BUCKET \</span>
+<span class="cmd">    --policy file://trail-bucket-policy.json</span></pre></div>
+      </div>
+    </div>
+    <div class="step" data-section="ct">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Create and start the CloudTrail</h3>
+      <p>Multi-region trail with log file validation — your forensic evidence chain.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">CloudTrail</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">aws cloudtrail create-trail \</span>
+<span class="cmd">    --name bootcamp-trail \</span>
+<span class="cmd">    --s3-bucket-name $LOG_BUCKET \</span>
+<span class="cmd">    --is-multi-region-trail \</span>
+<span class="cmd">    --enable-log-file-validation \</span>
+<span class="cmd">    --include-global-service-events</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">aws cloudtrail start-logging --name bootcamp-trail</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">aws cloudtrail get-trail-status --name bootcamp-trail</span></pre></div>
+      </div>
+      <div class="callout callout-warn">
+        <div class="cl-label">WHY THIS MATTERS</div>
+        <p>Log file validation creates a digital signature chain. If an attacker modifies logs to cover their tracks, the validation detects tampering. This is your forensic evidence — without it, you can't prove what happened during an incident.</p>
+      </div>
+    </div>
+    <div class="step" data-section="ct">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Verify logging</h3>
+      <p>Make a test API call, wait 5-10 minutes, then check for delivered logs.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Verify</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="cm"># Make a test call</span>
+<span class="pr">$</span> <span class="cmd">aws s3 ls</span>
+<span class="cmd"></span>
+<span class="cm"># Check for log delivery (wait 5-10 min)</span>
+<span class="pr">$</span> <span class="cmd">aws s3 ls s3://$LOG_BUCKET/AWSLogs/ --recursive | tail -5</span>
+<span class="cmd"></span>
+<span class="cm"># Validate integrity</span>
+<span class="pr">$</span> <span class="cmd">aws cloudtrail validate-logs \</span>
+<span class="cmd">    --trail-arn arn:aws:cloudtrail:us-east-1:${ACCOUNT_ID}:trail/bootcamp-trail \</span>
+<span class="cmd">    --start-time $(date -u -d '1 hour ago' +%Y-%m-%dT%H:%M:%SZ 2&gt;/dev/null || date -u -v-1H +%Y-%m-%dT%H:%M:%SZ)</span></pre></div>
+      </div>
+    </div>
+    <div class="nav-footer">
+      <button class="nav-btn" onclick="goToSection('vpc')">← PREV LAB</button>
+      <button class="nav-btn primary" onclick="goToSection('gd')">NEXT LAB →</button>
+    </div>
+  </div>
+  <div class="section-content " id="sec-gd">
+    <div class="section-header">
+      <h2>Lab 4: GuardDuty & Config</h2>
+      <div class="meta">~60 minutes // Threat detection, compliance rules, auto-remediation</div>
+    </div>
+    
+    <div class="step" data-section="gd">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Enable GuardDuty</h3>
+      <p>Automated threat detection — analyzes CloudTrail, VPC Flow Logs, and DNS logs for suspicious activity.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">GuardDuty</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">aws guardduty create-detector --enable \</span>
+<span class="cmd">    --finding-publishing-frequency FIFTEEN_MINUTES</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">DETECTOR_ID=$(aws guardduty list-detectors \</span>
+<span class="cmd">    --query 'DetectorIds[0]' --output text)</span>
+<span class="cmd"></span>
+<span class="cm"># Generate sample findings to test</span>
+<span class="pr">$</span> <span class="cmd">aws guardduty create-sample-findings \</span>
+<span class="cmd">    --detector-id $DETECTOR_ID \</span>
+<span class="cmd">    --finding-types 'UnauthorizedAccess:EC2/MaliciousIPCaller.Custom'</span>
+<span class="cmd"></span>
+<span class="cm"># View findings</span>
+<span class="pr">$</span> <span class="cmd">aws guardduty list-findings --detector-id $DETECTOR_ID</span></pre></div>
+      </div>
+    </div>
+    <div class="step" data-section="gd">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Enable AWS Config</h3>
+      <p>Continuous compliance monitoring — evaluates resources against rules you define.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Config recorder</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="cm"># Create Config service-linked role (if not exists)</span>
+<span class="pr">$</span> <span class="cmd">aws iam create-service-linked-role \</span>
+<span class="cmd">    --aws-service-name config.amazonaws.com 2&gt;/dev/null || true</span>
+<span class="cmd"></span>
+<span class="cm"># Start recording</span>
+<span class="pr">$</span> <span class="cmd">aws configservice put-configuration-recorder \</span>
+<span class="cmd">    --configuration-recorder name=default,roleARN=arn:aws:iam::${ACCOUNT_ID}:role/aws-service-role/config.amazonaws.com/AWSServiceRoleForConfig \</span>
+<span class="cmd">    --recording-group allSupported=true,includeGlobalResourceTypes=true</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">aws configservice put-delivery-channel \</span>
+<span class="cmd">    --delivery-channel name=default,s3BucketName=$LOG_BUCKET</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">aws configservice start-configuration-recorder \</span>
+<span class="cmd">    --configuration-recorder-name default</span></pre></div>
+      </div>
+    </div>
+    <div class="step" data-section="gd">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Add compliance rules</h3>
+      <p>Three managed rules: S3 public read, CloudTrail enabled, root MFA. These evaluate continuously, not just at creation.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Config rules</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">aws configservice put-config-rule --config-rule '{</span>
+<span class="cmd">    "ConfigRuleName": "s3-bucket-public-read-prohibited",</span>
+<span class="cmd">    "Source": {</span>
+<span class="cmd">        "Owner": "AWS",</span>
+<span class="cmd">        "SourceIdentifier": "S3_BUCKET_PUBLIC_READ_PROHIBITED"</span>
+<span class="cmd">    }</span>
+<span class="cmd">}'</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">aws configservice put-config-rule --config-rule '{</span>
+<span class="cmd">    "ConfigRuleName": "cloudtrail-enabled",</span>
+<span class="cmd">    "Source": {</span>
+<span class="cmd">        "Owner": "AWS",</span>
+<span class="cmd">        "SourceIdentifier": "CLOUD_TRAIL_ENABLED"</span>
+<span class="cmd">    }</span>
+<span class="cmd">}'</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">aws configservice put-config-rule --config-rule '{</span>
+<span class="cmd">    "ConfigRuleName": "root-account-mfa-enabled",</span>
+<span class="cmd">    "Source": {</span>
+<span class="cmd">        "Owner": "AWS",</span>
+<span class="cmd">        "SourceIdentifier": "ROOT_ACCOUNT_MFA_ENABLED"</span>
+<span class="cmd">    }</span>
+<span class="cmd">}'</span></pre></div>
+      </div>
+    </div>
+    <div class="step" data-section="gd">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Check compliance</h3>
+      <p>Review which resources pass and which fail your rules.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Compliance check</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="cm"># Wait a few minutes for evaluation</span>
+<span class="pr">$</span> <span class="cmd">aws configservice get-compliance-summary-by-config-rule</span>
+<span class="cmd"></span>
+<span class="cm"># Details on failures:</span>
+<span class="pr">$</span> <span class="cmd">aws configservice get-compliance-details-by-config-rule \</span>
+<span class="cmd">    --config-rule-name s3-bucket-public-read-prohibited \</span>
+<span class="cmd">    --compliance-types NON_COMPLIANT</span></pre></div>
+      </div>
+    </div>
+    <div class="nav-footer">
+      <button class="nav-btn" onclick="goToSection('ct')">← PREV LAB</button>
+      <button class="nav-btn primary" onclick="goToSection('audit')">NEXT LAB →</button>
+    </div>
+  </div>
+  <div class="section-content " id="sec-audit">
+    <div class="section-header">
+      <h2>Lab 5: Security Audit</h2>
+      <div class="meta">~60 minutes // Full environment audit — your first portfolio artifact</div>
+    </div>
+    
+    <div class="step" data-section="audit">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>IAM audit</h3>
+      <p>Check users, policies, MFA status, and Access Analyzer findings.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">IAM checks</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">aws iam list-users --query 'Users[].UserName' --output table</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">aws iam list-attached-user-policies --user-name bootcamp-student</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">aws iam get-user --user-name bootcamp-student \</span>
+<span class="cmd">    --query 'User.PermissionsBoundary'</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">aws accessanalyzer list-findings \</span>
+<span class="cmd">    --analyzer-arn $(aws accessanalyzer list-analyzers \</span>
+<span class="cmd">      --query 'analyzers[0].arn' --output text)</span></pre></div>
+      </div>
+    </div>
+    <div class="step" data-section="audit">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Network audit</h3>
+      <p>Check security groups, subnet routing, and flow logs.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Network checks</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">aws ec2 describe-security-groups \</span>
+<span class="cmd">    --query 'SecurityGroups[*].{Name:GroupName,ID:GroupId,Rules:IpPermissions}' \</span>
+<span class="cmd">    --output table</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">aws ec2 describe-subnets \</span>
+<span class="cmd">    --filters 'Name=vpc-id,Values='$VPC_ID \</span>
+<span class="cmd">    --query 'Subnets[].{Name:Tags[?Key==`Name`].Value|[0],Public:MapPublicIpOnLaunch}'</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">aws ec2 describe-flow-logs \</span>
+<span class="cmd">    --filter 'Name=resource-id,Values='$VPC_ID</span></pre></div>
+      </div>
+    </div>
+    <div class="step" data-section="audit">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Logging & detection audit</h3>
+      <p>Verify CloudTrail, GuardDuty, and Config are all active.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Logging checks</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">aws cloudtrail get-trail-status --name bootcamp-trail \</span>
+<span class="cmd">    --query '{Logging:IsLogging,LatestDelivery:LatestDeliveryTime}'</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">aws cloudtrail describe-trails \</span>
+<span class="cmd">    --query 'trailList[].{Name:Name,Validation:LogFileValidationEnabled}'</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">aws s3api get-public-access-block --bucket $LOG_BUCKET</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">aws guardduty get-detector --detector-id $DETECTOR_ID \</span>
+<span class="cmd">    --query '{Status:Status,Updated:UpdatedAt}'</span></pre></div>
+      </div>
+    </div>
+    <div class="step" data-section="audit">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Generate your findings report</h3>
+      <p>Create a markdown audit report — this is your first portfolio artifact for interviews.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Audit report template</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">cat &gt; week1-audit-report.md &lt;&lt; 'EOF'</span>
+<span class="cm"># Week 1 Security Audit Report</span>
+<span class="cmd">## Date: $(date +%Y-%m-%d)</span>
+<span class="cmd">## Auditor: [YOUR NAME]</span>
+<span class="cmd"></span>
+<span class="cmd">## IAM</span>
+<span class="cmd">- [ ] Root account MFA: ENABLED / NOT ENABLED</span>
+<span class="cmd">- [ ] No root access keys: PASS / FAIL</span>
+<span class="cmd">- [ ] Least-privilege policy applied: PASS / FAIL</span>
+<span class="cmd">- [ ] Permissions boundary set: PASS / FAIL</span>
+<span class="cmd">- [ ] Access Analyzer findings: X findings</span>
+<span class="cmd"></span>
+<span class="cmd">## Network</span>
+<span class="cmd">- [ ] VPC Flow Logs enabled: PASS / FAIL</span>
+<span class="cmd">- [ ] No 0.0.0.0/0 on SSH/RDP: PASS / FAIL</span>
+<span class="cmd">- [ ] Private subnets have no IGW route: PASS / FAIL</span>
+<span class="cmd">- [ ] Security groups use source-group refs: PASS / FAIL</span>
+<span class="cmd"></span>
+<span class="cmd">## Logging &amp; Detection</span>
+<span class="cmd">- [ ] CloudTrail multi-region: PASS / FAIL</span>
+<span class="cmd">- [ ] Log file validation: PASS / FAIL</span>
+<span class="cmd">- [ ] S3 log bucket not public: PASS / FAIL</span>
+<span class="cmd">- [ ] GuardDuty enabled: PASS / FAIL</span>
+<span class="cmd">- [ ] AWS Config rules active: PASS / FAIL</span>
+<span class="cmd">EOF</span></pre></div>
+      </div>
+    </div>
+    <div class="step" data-section="audit">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Cleanup — avoid charges</h3>
+      <p>Delete the NAT Gateway to stop the ~$32/month charge. Keep everything else (free tier).</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Cost management</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="cm"># Delete NAT Gateway (biggest cost item)</span>
+<span class="pr">$</span> <span class="cmd">aws ec2 delete-nat-gateway --nat-gateway-id $NAT_ID</span>
+<span class="cmd"></span>
+<span class="cm"># Release Elastic IP</span>
+<span class="pr">$</span> <span class="cmd">aws ec2 release-address --allocation-id $EIP_ID</span>
+<span class="cmd"></span>
+<span class="cm"># Keep everything else — free tier:</span>
+<span class="cm"># CloudTrail: first trail free</span>
+<span class="cm"># GuardDuty: 30-day trial</span>
+<span class="cm"># Config: first 3 rules free</span>
+<span class="cm"># VPC, subnets, SGs: free</span></pre></div>
+      </div>
+      <div class="callout callout-warn">
+        <div class="cl-label">WHY THIS MATTERS</div>
+        <p>NAT Gateways cost $0.045/hr (~$32/mo). Always delete when not actively labbing. You can recreate in 2 minutes when needed.</p>
+      </div>
+    </div>
+    <div class="nav-footer">
+      <button class="nav-btn" onclick="goToSection('gd')">← PREV LAB</button>
+      <a class="nav-btn primary" href="Week2_Labs.html">NEXT: WEEK 2 →</a>
+    </div>
+  </div>
+</div>
+<script>
+const sections = ["iam", "vpc", "ct", "gd", "audit"];
+document.querySelectorAll('.sec-tab').forEach(tab => {
+  tab.addEventListener('click', () => goToSection(tab.dataset.sec));
+});
+function goToSection(sec) {
+  document.querySelectorAll('.sec-tab').forEach(t => t.classList.toggle('active', t.dataset.sec === sec));
+  document.querySelectorAll('.section-content').forEach(c => c.classList.toggle('active', c.id === 'sec-' + sec));
+  window.scrollTo({ top: 280, behavior: 'smooth' });
+}
+function toggleStep(el) {
+  el.classList.toggle('done');
+  el.textContent = el.classList.contains('done') ? '✓' : '';
+  el.closest('.step').classList.toggle('completed');
+  updateProgress(); updateSectionTabs();
+}
+function updateProgress() {
+  const total = document.querySelectorAll('.step-check').length;
+  const done = document.querySelectorAll('.step-check.done').length;
+  document.getElementById('progressFill').style.width = (total > 0 ? (done/total)*100 : 0) + '%';
+  document.getElementById('progressText').textContent = done + ' of ' + total + ' steps completed' + (done === total && total > 0 ? ' — WEEK 1 COMPLETE' : '');
+}
+function updateSectionTabs() {
+  sections.forEach(sec => {
+    const steps = document.querySelectorAll('.step[data-section="'+sec+'"] .step-check');
+    const done = document.querySelectorAll('.step[data-section="'+sec+'"] .step-check.done');
+    const tab = document.querySelector('.sec-tab[data-sec="'+sec+'"]');
+    if (steps.length > 0 && done.length === steps.length) tab.classList.add('completed');
+    else tab.classList.remove('completed');
+  });
+}
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.textContent.replace(/COPY$/, '').trim()).then(() => {
+    btn.textContent = 'COPIED'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+updateProgress();
+</script>
+</body>
+</html>

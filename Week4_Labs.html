@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Week 4: Kubernetes Security — RAPID CYBER AI</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root { --blood: #8B0000; --crimson: #DC143C; --scarlet: #FF2D2D; --void: #0A0A0A; --carbon: #111; --steel: #1A1A1A; --ash: #222; --smoke: #888; --bone: #CCC; --text: #E0E0E0; --white: #F5F5F5; --accent: #00D4AA; --warn: #F59E0B; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'DM Sans', sans-serif; background: var(--void); color: var(--text); line-height: 1.7; }
+.header { background: var(--carbon); border-bottom: 2px solid var(--blood); padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand svg { width: 32px; height: 32px; }
+.brand span { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: var(--crimson); letter-spacing: 2px; }
+.header-meta { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--smoke); letter-spacing: 1px; }
+.progress-wrap { width: 100%; background: var(--ash); height: 3px; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--blood), var(--crimson)); width: 0%; transition: width 0.6s ease; }
+.progress-text { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--smoke); text-align: center; padding: 6px 0; background: var(--carbon); border-bottom: 1px solid var(--ash); }
+.container { max-width: 880px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+.hero { text-align: center; padding: 2.5rem 0; border-bottom: 1px solid var(--ash); margin-bottom: 2rem; }
+.hero-badge { display: inline-block; padding: 4px 14px; border: 1px solid var(--blood); border-radius: 20px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--crimson); letter-spacing: 2px; margin-bottom: 0.75rem; }
+.hero h1 { font-family: 'JetBrains Mono', monospace; font-size: 26px; color: var(--white); font-weight: 700; margin-bottom: 0.5rem; }
+.hero h1 span { color: var(--crimson); }
+.hero .sub { font-size: 14px; color: var(--smoke); }
+.hero .time { display: inline-flex; align-items: center; gap: 6px; margin-top: 0.75rem; padding: 6px 16px; background: var(--steel); border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--bone); }
+.hero .time .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--crimson); }
+.section-nav { display: flex; gap: 4px; margin-bottom: 2rem; flex-wrap: wrap; background: var(--carbon); padding: 6px; border-radius: 6px; border: 1px solid var(--ash); }
+.sec-tab { flex: 1; min-width: 80px; padding: 8px 8px; background: transparent; border: none; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--smoke); cursor: pointer; transition: all 0.2s; letter-spacing: 0.5px; text-align: center; }
+.sec-tab:hover { background: var(--steel); color: var(--bone); }
+.sec-tab.active { background: var(--blood); color: white; }
+.sec-tab .tab-check { display: inline-block; margin-right: 3px; opacity: 0; transition: opacity 0.3s; }
+.sec-tab.completed .tab-check { opacity: 1; color: var(--accent); }
+.section-content { display: none; animation: fadeIn 0.3s ease; }
+.section-content.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.section-header { margin-bottom: 1.5rem; }
+.section-header h2 { font-family: 'JetBrains Mono', monospace; font-size: 18px; color: var(--crimson); font-weight: 700; margin-bottom: 0.25rem; }
+.section-header .meta { font-size: 13px; color: var(--smoke); }
+.step { margin-bottom: 1.75rem; border-left: 2px solid var(--ash); padding-left: 1.25rem; position: relative; transition: all 0.3s; }
+.step::before { content: ''; position: absolute; left: -6px; top: 6px; width: 10px; height: 10px; background: var(--blood); border-radius: 50%; border: 2px solid var(--void); transition: all 0.3s; }
+.step.completed { border-left-color: var(--accent); }
+.step.completed::before { background: var(--accent); }
+.step h3 { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--bone); font-weight: 600; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 8px; }
+.step-check { width: 20px; height: 20px; border: 1.5px solid var(--ash); border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; font-size: 12px; color: transparent; user-select: none; }
+.step-check:hover { border-color: var(--crimson); }
+.step-check.done { background: var(--accent); border-color: var(--accent); color: var(--void); }
+.step p { font-size: 13px; color: var(--smoke); margin-bottom: 0.5rem; }
+.code-block { background: var(--void); border: 1px solid var(--ash); border-radius: 6px; margin: 0.75rem 0; position: relative; overflow: hidden; }
+.code-header { display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; background: var(--steel); border-bottom: 1px solid var(--ash); }
+.code-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--smoke); letter-spacing: 1px; }
+.copy-btn { background: var(--ash); border: 1px solid #333; color: var(--smoke); font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 2px 10px; border-radius: 3px; cursor: pointer; transition: all 0.2s; letter-spacing: 1px; }
+.copy-btn:hover { background: var(--blood); border-color: var(--blood); color: white; }
+.copy-btn.copied { background: var(--accent); border-color: var(--accent); color: var(--void); }
+.code-body { padding: 0.75rem 1rem; overflow-x: auto; }
+.code-body pre { font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.8; white-space: pre-wrap; word-break: break-word; }
+.pr { color: var(--crimson); } .cmd { color: #E2E8F0; } .cm { color: #555; }
+.callout { border-left: 3px solid; border-radius: 0 6px 6px 0; padding: 0.9rem 1rem; margin: 0.75rem 0; }
+.callout .cl-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 2px; font-weight: 700; margin-bottom: 0.25rem; }
+.callout p { font-size: 12px; margin-bottom: 0; }
+.callout-warn { background: #1A1400; border-color: var(--warn); }
+.callout-warn .cl-label { color: var(--warn); }
+.nav-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 2rem; border-top: 1px solid var(--ash); margin-top: 2rem; }
+.nav-btn { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--steel); border: 1px solid var(--ash); border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--bone); cursor: pointer; transition: all 0.2s; text-decoration: none; letter-spacing: 1px; }
+.nav-btn:hover { border-color: var(--crimson); color: var(--crimson); }
+.nav-btn.primary { background: var(--blood); border-color: var(--blood); color: white; }
+.nav-btn.primary:hover { background: var(--crimson); border-color: var(--crimson); }
+@media (max-width: 640px) { .container { padding: 1rem; } .section-nav { flex-direction: column; } .hero h1 { font-size: 20px; } }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="brand">
+    <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><path d="M28 4 L52 16 L52 40 L28 52 L4 40 L4 16 Z" fill="none" stroke="#DC143C" stroke-width="2"/><path d="M28 8 L48 18 L48 38 L28 48 L8 38 L8 18 Z" fill="#8B0000" opacity="0.3"/><circle cx="28" cy="20" r="3" fill="#DC143C"/><circle cx="20" cy="30" r="2.5" fill="#DC143C" opacity="0.7"/><circle cx="36" cy="30" r="2.5" fill="#DC143C" opacity="0.7"/><circle cx="28" cy="37" r="2.5" fill="#DC143C" opacity="0.8"/><line x1="28" y1="20" x2="20" y2="30" stroke="#DC143C" stroke-width="0.7" opacity="0.4"/><line x1="28" y1="20" x2="36" y2="30" stroke="#DC143C" stroke-width="0.7" opacity="0.4"/><line x1="20" y1="30" x2="28" y2="37" stroke="#DC143C" stroke-width="0.7" opacity="0.4"/><line x1="36" y1="30" x2="28" y2="37" stroke="#DC143C" stroke-width="0.7" opacity="0.4"/><rect x="24" y="42" width="8" height="2" fill="#DC143C" opacity="0.8"/></svg>
+    <span>RAPID CYBER AI</span>
+  </div>
+  <span class="header-meta">WEEK 4 OF 8</span>
+</div>
+<div class="progress-wrap"><div class="progress-fill" id="progressFill"></div></div>
+<div class="progress-text" id="progressText">0 steps completed</div>
+<div class="container">
+  <div class="hero">
+    <div class="hero-badge">WEEK 4</div>
+    <h1><span>Kubernetes Security</span></h1>
+    <p class="sub">Lock down clusters from RBAC to runtime detection</p>
+    <div class="time"><span class="dot"></span> 10-12 hours</div>
+  </div>
+  <div class="section-nav" id="sectionNav">
+    <button class="sec-tab active" data-sec="rbac"><span class="tab-check">✓</span>RBAC</button>
+    <button class="sec-tab " data-sec="netpol"><span class="tab-check">✓</span>NETWORK POLICY</button>
+    <button class="sec-tab " data-sec="pss"><span class="tab-check">✓</span>POD SECURITY</button>
+    <button class="sec-tab " data-sec="opa"><span class="tab-check">✓</span>GATEKEEPER</button>
+    <button class="sec-tab " data-sec="falco"><span class="tab-check">✓</span>FALCO</button>
+  </div>
+
+  <div class="section-content active" id="sec-rbac">
+    <div class="section-header">
+      <h2>Lab 1: RBAC & Service Accounts</h2>
+      <div class="meta">~90 min</div>
+    </div>
+    
+    <div class="step" data-section="rbac">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Create a local cluster with kind</h3>
+      <p>kind runs Kubernetes inside Docker. Perfect for security labs without cloud costs.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Cluster</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">kind create cluster --name bootcamp</span>
+<span class="pr">$</span> <span class="cmd">kubectl cluster-info --context kind-bootcamp</span>
+<span class="pr">$</span> <span class="cmd">kubectl get nodes</span></pre></div>
+      </div>
+    </div>
+    <div class="step" data-section="rbac">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Create scoped RBAC</h3>
+      <p>Scoped role that only allows reading pods and services in one namespace.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">RBAC</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">kubectl create namespace bootcamp-app</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">cat &gt; role.yaml &lt;&lt; 'EOF'</span>
+<span class="cmd">apiVersion: rbac.authorization.k8s.io/v1</span>
+<span class="cmd">kind: Role</span>
+<span class="cmd">metadata:</span>
+<span class="cmd">  namespace: bootcamp-app</span>
+<span class="cmd">  name: pod-reader</span>
+<span class="cmd">rules:</span>
+<span class="cmd">- apiGroups: [""]</span>
+<span class="cmd">  resources: ["pods", "services"]</span>
+<span class="cmd">  verbs: ["get", "list", "watch"]</span>
+<span class="cmd">EOF</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">kubectl apply -f role.yaml</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">cat &gt; binding.yaml &lt;&lt; 'EOF'</span>
+<span class="cmd">apiVersion: rbac.authorization.k8s.io/v1</span>
+<span class="cmd">kind: RoleBinding</span>
+<span class="cmd">metadata:</span>
+<span class="cmd">  namespace: bootcamp-app</span>
+<span class="cmd">  name: read-pods</span>
+<span class="cmd">subjects:</span>
+<span class="cmd">- kind: ServiceAccount</span>
+<span class="cmd">  name: app-reader</span>
+<span class="cmd">  namespace: bootcamp-app</span>
+<span class="cmd">roleRef:</span>
+<span class="cmd">  kind: Role</span>
+<span class="cmd">  name: pod-reader</span>
+<span class="cmd">  apiGroup: rbac.authorization.k8s.io</span>
+<span class="cmd">EOF</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">kubectl apply -f binding.yaml</span></pre></div>
+      </div>
+    </div>
+    <div class="step" data-section="rbac">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Test access controls</h3>
+      <p>The service account can read pods in its namespace but nothing else.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Verify RBAC</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="cm"># Check what the service account can do:</span>
+<span class="pr">$</span> <span class="cmd">kubectl auth can-i list pods --namespace bootcamp-app --as system:serviceaccount:bootcamp-app:app-reader</span>
+<span class="cm"># yes</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">kubectl auth can-i create pods --namespace bootcamp-app --as system:serviceaccount:bootcamp-app:app-reader</span>
+<span class="cm"># no</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">kubectl auth can-i list pods --namespace kube-system --as system:serviceaccount:bootcamp-app:app-reader</span>
+<span class="cm"># no</span></pre></div>
+      </div>
+    </div>
+    <div class="nav-footer">
+      <div></div>
+      <button class="nav-btn primary" onclick="goToSection('netpol')">NEXT LAB →</button>
+    </div>
+  </div>
+  <div class="section-content " id="sec-netpol">
+    <div class="section-header">
+      <h2>Lab 2: Network Policies</h2>
+      <div class="meta">~90 min</div>
+    </div>
+    
+    <div class="step" data-section="netpol">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Install Calico CNI</h3>
+      <p>Default kind CNI doesn't support NetworkPolicies. Calico does.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Calico</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="cm"># Delete existing cluster and recreate with Calico</span>
+<span class="pr">$</span> <span class="cmd">kind delete cluster --name bootcamp</span>
+<span class="pr">$</span> <span class="cmd">cat &gt; kind-config.yaml &lt;&lt; 'EOF'</span>
+<span class="cmd">kind: Cluster</span>
+<span class="cmd">apiVersion: kind.x-k8s.io/v1alpha4</span>
+<span class="cmd">networking:</span>
+<span class="cmd">  disableDefaultCNI: true</span>
+<span class="cmd">  podSubnet: "192.168.0.0/16"</span>
+<span class="cmd">EOF</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">kind create cluster --name bootcamp --config kind-config.yaml</span>
+<span class="pr">$</span> <span class="cmd">kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.27.0/manifests/calico.yaml</span>
+<span class="pr">$</span> <span class="cmd">kubectl wait --for=condition=Ready nodes --all --timeout=120s</span></pre></div>
+      </div>
+    </div>
+    <div class="step" data-section="netpol">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Apply default-deny</h3>
+      <p>Blocks all traffic. Now nothing communicates — we selectively open what's needed.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Default deny</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">cat &gt; default-deny.yaml &lt;&lt; 'EOF'</span>
+<span class="cmd">apiVersion: networking.k8s.io/v1</span>
+<span class="cmd">kind: NetworkPolicy</span>
+<span class="cmd">metadata:</span>
+<span class="cmd">  name: default-deny-all</span>
+<span class="cmd">  namespace: bootcamp-app</span>
+<span class="cmd">spec:</span>
+<span class="cmd">  podSelector: {}</span>
+<span class="cmd">  policyTypes:</span>
+<span class="cmd">  - Ingress</span>
+<span class="cmd">  - Egress</span>
+<span class="cmd">EOF</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">kubectl apply -f default-deny.yaml</span></pre></div>
+      </div>
+      <div class="callout callout-warn">
+        <div class="cl-label">WHY THIS MATTERS</div>
+        <p>By default, every pod can talk to every other pod. One compromised pod reaches your database, your secrets, your monitoring. Default-deny fixes this.</p>
+      </div>
+    </div>
+    <div class="step" data-section="netpol">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Allow frontend→backend traffic</h3>
+      <p>Backend only accepts traffic from frontend pods on port 8080. Everything else is blocked.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Allow policy</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">cat &gt; allow-frontend.yaml &lt;&lt; 'EOF'</span>
+<span class="cmd">apiVersion: networking.k8s.io/v1</span>
+<span class="cmd">kind: NetworkPolicy</span>
+<span class="cmd">metadata:</span>
+<span class="cmd">  name: allow-frontend-to-backend</span>
+<span class="cmd">  namespace: bootcamp-app</span>
+<span class="cmd">spec:</span>
+<span class="cmd">  podSelector:</span>
+<span class="cmd">    matchLabels:</span>
+<span class="cmd">      app: backend</span>
+<span class="cmd">  policyTypes:</span>
+<span class="cmd">  - Ingress</span>
+<span class="cmd">  ingress:</span>
+<span class="cmd">  - from:</span>
+<span class="cmd">    - podSelector:</span>
+<span class="cmd">        matchLabels:</span>
+<span class="cmd">          app: frontend</span>
+<span class="cmd">    ports:</span>
+<span class="cmd">    - protocol: TCP</span>
+<span class="cmd">      port: 8080</span>
+<span class="cmd">EOF</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">kubectl apply -f allow-frontend.yaml</span></pre></div>
+      </div>
+    </div>
+    <div class="nav-footer">
+      <button class="nav-btn" onclick="goToSection('rbac')">← PREV LAB</button>
+      <button class="nav-btn primary" onclick="goToSection('pss')">NEXT LAB →</button>
+    </div>
+  </div>
+  <div class="section-content " id="sec-pss">
+    <div class="section-header">
+      <h2>Lab 3: Pod Security Standards</h2>
+      <div class="meta">~60 min</div>
+    </div>
+    
+    <div class="step" data-section="pss">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Apply restricted profile</h3>
+      <p>Restricted profile prevents root containers, privileged mode, hostPath mounts, and more.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">PSS</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">kubectl label namespace bootcamp-app \</span>
+<span class="cmd">    pod-security.kubernetes.io/enforce=restricted \</span>
+<span class="cmd">    pod-security.kubernetes.io/warn=restricted \</span>
+<span class="cmd">    pod-security.kubernetes.io/audit=restricted</span>
+<span class="cmd"></span>
+<span class="cm"># Try deploying a privileged pod (should be rejected):</span>
+<span class="pr">$</span> <span class="cmd">kubectl run test-priv --image=nginx --namespace bootcamp-app \</span>
+<span class="cmd">    --overrides='{"spec":{"containers":[{"name":"test","image":"nginx","securityContext":{"privileged":true}}]}}'</span>
+<span class="cm"># Error: violates PodSecurity "restricted"</span></pre></div>
+      </div>
+    </div>
+    <div class="step" data-section="pss">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Deploy a compliant pod</h3>
+      <p>Non-root, read-only filesystem, dropped capabilities, resource limits, seccomp profile.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Compliant pod</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">cat &gt; secure-pod.yaml &lt;&lt; 'EOF'</span>
+<span class="cmd">apiVersion: v1</span>
+<span class="cmd">kind: Pod</span>
+<span class="cmd">metadata:</span>
+<span class="cmd">  name: secure-app</span>
+<span class="cmd">  namespace: bootcamp-app</span>
+<span class="cmd">  labels:</span>
+<span class="cmd">    app: backend</span>
+<span class="cmd">spec:</span>
+<span class="cmd">  securityContext:</span>
+<span class="cmd">    runAsNonRoot: true</span>
+<span class="cmd">    seccompProfile:</span>
+<span class="cmd">      type: RuntimeDefault</span>
+<span class="cmd">  containers:</span>
+<span class="cmd">  - name: app</span>
+<span class="cmd">    image: nginx:alpine</span>
+<span class="cmd">    securityContext:</span>
+<span class="cmd">      allowPrivilegeEscalation: false</span>
+<span class="cmd">      capabilities:</span>
+<span class="cmd">        drop: ["ALL"]</span>
+<span class="cmd">      readOnlyRootFilesystem: true</span>
+<span class="cmd">    resources:</span>
+<span class="cmd">      requests:</span>
+<span class="cmd">        cpu: 100m</span>
+<span class="cmd">        memory: 128Mi</span>
+<span class="cmd">      limits:</span>
+<span class="cmd">        cpu: 500m</span>
+<span class="cmd">        memory: 256Mi</span>
+<span class="cmd">EOF</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">kubectl apply -f secure-pod.yaml</span></pre></div>
+      </div>
+    </div>
+    <div class="nav-footer">
+      <button class="nav-btn" onclick="goToSection('netpol')">← PREV LAB</button>
+      <button class="nav-btn primary" onclick="goToSection('opa')">NEXT LAB →</button>
+    </div>
+  </div>
+  <div class="section-content " id="sec-opa">
+    <div class="section-header">
+      <h2>Lab 4: OPA Gatekeeper</h2>
+      <div class="meta">~60 min</div>
+    </div>
+    
+    <div class="step" data-section="opa">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Install Gatekeeper</h3>
+      <p>Gatekeeper enforces custom policies at admission time.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Install</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">helm repo add gatekeeper https://open-policy-agent.github.io/gatekeeper/charts</span>
+<span class="pr">$</span> <span class="cmd">helm install gatekeeper gatekeeper/gatekeeper \</span>
+<span class="cmd">    --namespace gatekeeper-system --create-namespace</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">kubectl wait --for=condition=Ready pods -l app=gatekeeper -n gatekeeper-system --timeout=120s</span></pre></div>
+      </div>
+    </div>
+    <div class="step" data-section="opa">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Create a registry restriction policy</h3>
+      <p>Only images from your approved registry are allowed to deploy.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Policy</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">cat &gt; registry-constraint-template.yaml &lt;&lt; 'EOF'</span>
+<span class="cmd">apiVersion: templates.gatekeeper.sh/v1</span>
+<span class="cmd">kind: ConstraintTemplate</span>
+<span class="cmd">metadata:</span>
+<span class="cmd">  name: k8sallowedrepos</span>
+<span class="cmd">spec:</span>
+<span class="cmd">  crd:</span>
+<span class="cmd">    spec:</span>
+<span class="cmd">      names:</span>
+<span class="cmd">        kind: K8sAllowedRepos</span>
+<span class="cmd">      validation:</span>
+<span class="cmd">        openAPIV3Schema:</span>
+<span class="cmd">          type: object</span>
+<span class="cmd">          properties:</span>
+<span class="cmd">            repos:</span>
+<span class="cmd">              type: array</span>
+<span class="cmd">              items:</span>
+<span class="cmd">                type: string</span>
+<span class="cmd">  targets:</span>
+<span class="cmd">    - target: admission.k8s.gatekeeper.sh</span>
+<span class="cmd">      rego: |</span>
+<span class="cmd">        package k8sallowedrepos</span>
+<span class="cmd">        violation[{"msg": msg}] {</span>
+<span class="cmd">          container := input.review.object.spec.containers[_]</span>
+<span class="cmd">          not startswith(container.image, input.parameters.repos[_])</span>
+<span class="cmd">          msg := sprintf("image '%v' not from allowed registry", [container.image])</span>
+<span class="cmd">        }</span>
+<span class="cmd">EOF</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">kubectl apply -f registry-constraint-template.yaml</span></pre></div>
+      </div>
+    </div>
+    <div class="nav-footer">
+      <button class="nav-btn" onclick="goToSection('pss')">← PREV LAB</button>
+      <button class="nav-btn primary" onclick="goToSection('falco')">NEXT LAB →</button>
+    </div>
+  </div>
+  <div class="section-content " id="sec-falco">
+    <div class="section-header">
+      <h2>Lab 5: Runtime Detection with Falco</h2>
+      <div class="meta">~60 min</div>
+    </div>
+    
+    <div class="step" data-section="falco">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Install Falco</h3>
+      <p>Falco monitors system calls in real-time and alerts on suspicious container activity.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Falco</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">helm repo add falcosecurity https://falcosecurity.github.io/charts</span>
+<span class="pr">$</span> <span class="cmd">helm install falco falcosecurity/falco \</span>
+<span class="cmd">    --namespace falco --create-namespace \</span>
+<span class="cmd">    --set falcosidekick.enabled=true</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">kubectl wait --for=condition=Ready pods -l app.kubernetes.io/name=falco -n falco --timeout=120s</span></pre></div>
+      </div>
+    </div>
+    <div class="step" data-section="falco">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Trigger and view detections</h3>
+      <p>Falco detects shell spawning, file writes to sensitive dirs, unexpected network connections, and more.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Test detection</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="cm"># Exec into a pod (Falco should alert)</span>
+<span class="pr">$</span> <span class="cmd">kubectl exec -it secure-app -n bootcamp-app -- sh</span>
+<span class="cmd"></span>
+<span class="cm"># Check Falco logs for the detection:</span>
+<span class="pr">$</span> <span class="cmd">kubectl logs -l app.kubernetes.io/name=falco -n falco --tail=20 | grep -i "shell"</span>
+<span class="cmd"></span>
+<span class="cm"># You should see:</span>
+<span class="cm"># Notice: A shell was spawned in a container</span></pre></div>
+      </div>
+    </div>
+    <div class="step" data-section="falco">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Week 4 cleanup</h3>
+      <p>Delete the kind cluster. Zero cloud costs for this week.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Cleanup</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">kind delete cluster --name bootcamp</span>
+<span class="cm"># All resources are removed with the cluster</span></pre></div>
+      </div>
+    </div>
+    <div class="nav-footer">
+      <button class="nav-btn" onclick="goToSection('opa')">← PREV LAB</button>
+      <a class="nav-btn primary" href="Week5_Labs.html">NEXT: WEEK 5 →</a>
+    </div>
+  </div>
+</div>
+<script>
+const sections = ["rbac", "netpol", "pss", "opa", "falco"];
+document.querySelectorAll('.sec-tab').forEach(tab => {
+  tab.addEventListener('click', () => goToSection(tab.dataset.sec));
+});
+function goToSection(sec) {
+  document.querySelectorAll('.sec-tab').forEach(t => t.classList.toggle('active', t.dataset.sec === sec));
+  document.querySelectorAll('.section-content').forEach(c => c.classList.toggle('active', c.id === 'sec-' + sec));
+  window.scrollTo({ top: 280, behavior: 'smooth' });
+}
+function toggleStep(el) {
+  el.classList.toggle('done');
+  el.textContent = el.classList.contains('done') ? '✓' : '';
+  el.closest('.step').classList.toggle('completed');
+  updateProgress(); updateSectionTabs();
+}
+function updateProgress() {
+  const total = document.querySelectorAll('.step-check').length;
+  const done = document.querySelectorAll('.step-check.done').length;
+  document.getElementById('progressFill').style.width = (total > 0 ? (done/total)*100 : 0) + '%';
+  document.getElementById('progressText').textContent = done + ' of ' + total + ' steps completed' + (done === total && total > 0 ? ' — WEEK 4 COMPLETE' : '');
+}
+function updateSectionTabs() {
+  sections.forEach(sec => {
+    const steps = document.querySelectorAll('.step[data-section="'+sec+'"] .step-check');
+    const done = document.querySelectorAll('.step[data-section="'+sec+'"] .step-check.done');
+    const tab = document.querySelector('.sec-tab[data-sec="'+sec+'"]');
+    if (steps.length > 0 && done.length === steps.length) tab.classList.add('completed');
+    else tab.classList.remove('completed');
+  });
+}
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.textContent.replace(/COPY$/, '').trim()).then(() => {
+    btn.textContent = 'COPIED'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+updateProgress();
+</script>
+</body>
+</html>

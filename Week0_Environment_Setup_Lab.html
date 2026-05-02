@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Week 0: Environment Setup — RAPID CYBER AI</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blood: #8B0000; --crimson: #DC143C; --scarlet: #FF2D2D; --ember: #FF4444;
+  --void: #0A0A0A; --carbon: #111; --steel: #1A1A1A; --ash: #222; --slate: #2A2A2A;
+  --smoke: #888; --bone: #CCC; --text: #E0E0E0; --white: #F5F5F5;
+  --accent: #00D4AA; --warn: #F59E0B; --info: #3B82F6; --success: #10B981;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'DM Sans', sans-serif; background: var(--void); color: var(--text); line-height: 1.7; }
+
+/* ─── Header ─── */
+.header {
+  background: var(--carbon);
+  border-bottom: 2px solid var(--blood);
+  padding: 1rem 1.5rem;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+}
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand svg { width: 32px; height: 32px; }
+.brand span { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: var(--crimson); letter-spacing: 2px; }
+.header-meta { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--smoke); letter-spacing: 1px; }
+
+/* ─── Progress ─── */
+.progress-wrap { width: 100%; background: var(--ash); height: 3px; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--blood), var(--crimson)); width: 0%; transition: width 0.6s ease; }
+.progress-text {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--smoke);
+  text-align: center; padding: 6px 0; background: var(--carbon); border-bottom: 1px solid var(--ash);
+}
+
+/* ─── Container ─── */
+.container { max-width: 880px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+/* ─── Hero ─── */
+.hero { text-align: center; padding: 2.5rem 0; border-bottom: 1px solid var(--ash); margin-bottom: 2rem; }
+.hero-badge {
+  display: inline-block; padding: 4px 14px; border: 1px solid var(--blood);
+  border-radius: 20px; font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: var(--crimson); letter-spacing: 2px; margin-bottom: 1rem;
+}
+.hero h1 { font-family: 'JetBrains Mono', monospace; font-size: 28px; color: var(--white); font-weight: 700; margin-bottom: 0.5rem; }
+.hero h1 span { color: var(--crimson); }
+.hero .sub { font-size: 14px; color: var(--smoke); max-width: 560px; margin: 0 auto; }
+.hero .time-est {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-top: 1rem; padding: 6px 16px; background: var(--steel);
+  border-radius: 4px; font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; color: var(--bone);
+}
+.hero .time-est .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--crimson); }
+
+/* ─── Section tabs ─── */
+.section-nav {
+  display: flex; gap: 4px; margin-bottom: 2rem; flex-wrap: wrap;
+  background: var(--carbon); padding: 6px; border-radius: 6px; border: 1px solid var(--ash);
+}
+.sec-tab {
+  flex: 1; min-width: 100px; padding: 8px 10px; background: transparent;
+  border: none; border-radius: 4px; font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--smoke); cursor: pointer; transition: all 0.2s;
+  letter-spacing: 0.5px; text-align: center;
+}
+.sec-tab:hover { background: var(--steel); color: var(--bone); }
+.sec-tab.active { background: var(--blood); color: white; }
+.sec-tab .tab-check { display: inline-block; margin-right: 4px; opacity: 0; transition: opacity 0.3s; }
+.sec-tab.completed .tab-check { opacity: 1; color: var(--accent); }
+
+/* ─── Section content ─── */
+.section-content { display: none; }
+.section-content.active { display: block; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+.section-header { margin-bottom: 1.5rem; }
+.section-header h2 {
+  font-family: 'JetBrains Mono', monospace; font-size: 18px;
+  color: var(--crimson); font-weight: 700; margin-bottom: 0.25rem;
+}
+.section-header .meta { font-size: 13px; color: var(--smoke); }
+
+/* ─── OS Toggle ─── */
+.os-toggle {
+  display: flex; gap: 0; margin: 1rem 0; border: 1px solid var(--ash); border-radius: 6px; overflow: hidden; width: fit-content;
+}
+.os-btn {
+  padding: 6px 16px; background: var(--steel); border: none;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  color: var(--smoke); cursor: pointer; transition: all 0.2s;
+  border-right: 1px solid var(--ash); letter-spacing: 1px;
+}
+.os-btn:last-child { border-right: none; }
+.os-btn:hover { color: var(--bone); }
+.os-btn.active { background: var(--blood); color: white; }
+
+/* ─── Steps ─── */
+.step {
+  margin-bottom: 2rem; border-left: 2px solid var(--ash);
+  padding-left: 1.25rem; position: relative; transition: all 0.3s;
+}
+.step::before {
+  content: ''; position: absolute; left: -6px; top: 6px;
+  width: 10px; height: 10px; background: var(--blood); border-radius: 50%;
+  border: 2px solid var(--void); transition: all 0.3s;
+}
+.step.completed { border-left-color: var(--accent); }
+.step.completed::before { background: var(--accent); }
+.step h3 {
+  font-family: 'JetBrains Mono', monospace; font-size: 14px;
+  color: var(--bone); font-weight: 600; margin-bottom: 0.4rem;
+  display: flex; align-items: center; gap: 8px;
+}
+.step-check {
+  width: 20px; height: 20px; border: 1.5px solid var(--ash); border-radius: 4px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; flex-shrink: 0; font-size: 12px; color: transparent;
+  user-select: none;
+}
+.step-check:hover { border-color: var(--crimson); }
+.step-check.done { background: var(--accent); border-color: var(--accent); color: var(--void); }
+.step p { font-size: 13px; color: var(--smoke); margin-bottom: 0.5rem; }
+.step a { color: var(--crimson); text-decoration: none; border-bottom: 1px solid var(--blood); }
+.step a:hover { color: var(--scarlet); }
+
+/* ─── Code blocks ─── */
+.code-block {
+  background: var(--void); border: 1px solid var(--ash); border-radius: 6px;
+  margin: 0.75rem 0; position: relative; overflow: hidden;
+}
+.code-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 6px 12px; background: var(--steel); border-bottom: 1px solid var(--ash);
+}
+.code-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--smoke); letter-spacing: 1px; }
+.copy-btn {
+  background: var(--ash); border: 1px solid #333; color: var(--smoke);
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  padding: 2px 10px; border-radius: 3px; cursor: pointer; transition: all 0.2s; letter-spacing: 1px;
+}
+.copy-btn:hover { background: var(--blood); border-color: var(--blood); color: white; }
+.copy-btn.copied { background: var(--accent); border-color: var(--accent); color: var(--void); }
+.code-body { padding: 0.75rem 1rem; overflow-x: auto; }
+.code-body pre {
+  font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  line-height: 1.8; white-space: pre-wrap; word-break: break-word;
+}
+.pr { color: var(--crimson); } .cmd { color: #E2E8F0; } .cm { color: #555; }
+.fl { color: var(--accent); } .str { color: var(--warn); } .out { color: var(--success); }
+
+/* ─── OS-specific code ─── */
+.os-code { display: none; }
+.os-code.active { display: block; }
+
+/* ─── Callout boxes ─── */
+.callout {
+  border-left: 3px solid; border-radius: 0 6px 6px 0;
+  padding: 0.9rem 1rem; margin: 0.75rem 0;
+}
+.callout .cl-label {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: 2px; font-weight: 700; margin-bottom: 0.25rem;
+}
+.callout p { font-size: 12px; margin-bottom: 0; }
+.callout-warn { background: #1A1400; border-color: var(--warn); }
+.callout-warn .cl-label { color: var(--warn); }
+.callout-info { background: #0A1225; border-color: var(--info); }
+.callout-info .cl-label { color: var(--info); }
+.callout-success { background: #0A1A15; border-color: var(--success); }
+.callout-success .cl-label { color: var(--success); }
+.callout-blood { background: #1A0808; border-color: var(--crimson); }
+.callout-blood .cl-label { color: var(--crimson); }
+
+/* ─── Verification box ─── */
+.verify-box {
+  background: var(--steel); border: 1px solid var(--ash); border-radius: 6px;
+  padding: 1rem; margin: 1rem 0;
+}
+.verify-box .vb-label {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  color: var(--accent); letter-spacing: 2px; font-weight: 700; margin-bottom: 0.5rem;
+}
+.verify-item {
+  display: flex; align-items: center; gap: 8px; padding: 4px 0;
+  font-size: 12px; color: var(--smoke);
+}
+.verify-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ash); flex-shrink: 0; }
+.verify-item.pass .verify-dot { background: var(--success); }
+.verify-item.fail .verify-dot { background: var(--crimson); }
+
+/* ─── Checkpoint ─── */
+.checkpoint {
+  background: var(--steel); border: 1px solid var(--accent); border-radius: 6px;
+  padding: 1rem; margin: 1.5rem 0;
+}
+.checkpoint .cp-label {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  color: var(--accent); letter-spacing: 2px; font-weight: 700; margin-bottom: 0.5rem;
+}
+.checkpoint ul { list-style: none; padding: 0; }
+.checkpoint li {
+  font-size: 12px; color: var(--smoke); padding: 3px 0 3px 1.25rem;
+  position: relative;
+}
+.checkpoint li::before {
+  content: '>';  position: absolute; left: 0;
+  color: var(--accent); font-family: 'JetBrains Mono', monospace;
+}
+
+/* ─── Nav footer ─── */
+.nav-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  padding-top: 2rem; border-top: 1px solid var(--ash); margin-top: 2rem;
+}
+.nav-btn {
+  display: flex; align-items: center; gap: 6px; padding: 8px 16px;
+  background: var(--steel); border: 1px solid var(--ash); border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace; font-size: 12px;
+  color: var(--bone); cursor: pointer; transition: all 0.2s; text-decoration: none; letter-spacing: 1px;
+}
+.nav-btn:hover { border-color: var(--crimson); color: var(--crimson); }
+.nav-btn.primary { background: var(--blood); border-color: var(--blood); color: white; }
+.nav-btn.primary:hover { background: var(--crimson); border-color: var(--crimson); }
+
+@media (max-width: 640px) {
+  .container { padding: 1rem; }
+  .section-nav { flex-direction: column; }
+  .sec-tab { min-width: auto; }
+  .hero h1 { font-size: 22px; }
+  .os-toggle { width: 100%; }
+  .os-btn { flex: 1; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="brand">
+    <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+      <path d="M28 4 L52 16 L52 40 L28 52 L4 40 L4 16 Z" fill="none" stroke="#DC143C" stroke-width="2"/>
+      <path d="M28 8 L48 18 L48 38 L28 48 L8 38 L8 18 Z" fill="#8B0000" opacity="0.3"/>
+      <circle cx="28" cy="20" r="3" fill="#DC143C"/><circle cx="20" cy="30" r="2.5" fill="#DC143C" opacity="0.7"/>
+      <circle cx="36" cy="30" r="2.5" fill="#DC143C" opacity="0.7"/><circle cx="28" cy="37" r="2.5" fill="#DC143C" opacity="0.8"/>
+      <line x1="28" y1="20" x2="20" y2="30" stroke="#DC143C" stroke-width="0.7" opacity="0.4"/>
+      <line x1="28" y1="20" x2="36" y2="30" stroke="#DC143C" stroke-width="0.7" opacity="0.4"/>
+      <line x1="20" y1="30" x2="28" y2="37" stroke="#DC143C" stroke-width="0.7" opacity="0.4"/>
+      <line x1="36" y1="30" x2="28" y2="37" stroke="#DC143C" stroke-width="0.7" opacity="0.4"/>
+      <rect x="24" y="42" width="8" height="2" fill="#DC143C" opacity="0.8"/>
+    </svg>
+    <span>RAPID CYBER AI</span>
+  </div>
+  <span class="header-meta">PREREQUISITE LAB</span>
+</div>
+<div class="progress-wrap"><div class="progress-fill" id="progressFill"></div></div>
+<div class="progress-text" id="progressText">0 of 18 steps completed</div>
+
+<!-- Main -->
+<div class="container">
+
+  <div class="hero">
+    <div class="hero-badge">COMPLETE BEFORE WEEK 1</div>
+    <h1>Week 0: <span>Environment Setup</span></h1>
+    <p class="sub">Install and configure every tool you'll use across the 8-week bootcamp. Complete all steps below before starting Lab 1.</p>
+    <div class="time-est"><span class="dot"></span> Estimated time: 45–60 minutes</div>
+  </div>
+
+  <!-- OS Toggle (global) -->
+  <div style="text-align:center; margin-bottom: 1.5rem;">
+    <p style="font-size: 12px; color: var(--smoke); margin-bottom: 8px; font-family: 'JetBrains Mono', monospace; letter-spacing: 1px;">SELECT YOUR OS</p>
+    <div class="os-toggle" style="margin: 0 auto;" id="globalOS">
+      <button class="os-btn" data-os="mac" onclick="setOS('mac')">macOS</button>
+      <button class="os-btn active" data-os="windows" onclick="setOS('windows')">WINDOWS/WSL</button>
+      <button class="os-btn" data-os="linux" onclick="setOS('linux')">LINUX</button>
+    </div>
+  </div>
+
+  <!-- Section nav -->
+  <div class="section-nav" id="sectionNav">
+    <button class="sec-tab active" data-sec="aws"><span class="tab-check">✓</span>AWS ACCOUNT</button>
+    <button class="sec-tab" data-sec="cli"><span class="tab-check">✓</span>AWS CLI</button>
+    <button class="sec-tab" data-sec="terraform"><span class="tab-check">✓</span>TERRAFORM</button>
+    <button class="sec-tab" data-sec="docker"><span class="tab-check">✓</span>DOCKER</button>
+    <button class="sec-tab" data-sec="k8s"><span class="tab-check">✓</span>KUBECTL</button>
+    <button class="sec-tab" data-sec="verify"><span class="tab-check">✓</span>VERIFY ALL</button>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 1: AWS ACCOUNT -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="section-content active" id="sec-aws">
+    <div class="section-header">
+      <h2>1. AWS Free Tier Account</h2>
+      <div class="meta">Create your AWS account and generate access credentials</div>
+    </div>
+
+    <div class="step" data-section="aws">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Create your AWS account</h3>
+      <p>Go to <a href="https://aws.amazon.com/free" target="_blank">aws.amazon.com/free</a> and click "Create a Free Account." You'll need a credit card (you won't be charged for Free Tier usage), an email address, and a phone number for verification.</p>
+      <div class="callout callout-warn">
+        <div class="cl-label">COST WARNING</div>
+        <p>The Free Tier covers most services we'll use. The one exception is NAT Gateways (~$32/month). We'll create and delete these only when actively labbing. I'll remind you every time.</p>
+      </div>
+    </div>
+
+    <div class="step" data-section="aws">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Secure the root account</h3>
+      <p>Log into the AWS Console. Go to <strong>IAM → Security credentials → Assign MFA device</strong>. Choose "Virtual MFA device." Scan the QR code with <strong>Google Authenticator</strong> or <strong>Authy</strong> (download from your phone's app store if you don't have one). Enter two consecutive codes to complete setup.</p>
+      <div class="callout callout-blood">
+        <div class="cl-label">NON-NEGOTIABLE</div>
+        <p>If your root account is compromised without MFA, an attacker has unlimited access to your AWS organization — they can delete everything, create resources, and rack up charges. Do this now.</p>
+      </div>
+    </div>
+
+    <div class="step" data-section="aws">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Create an IAM admin user</h3>
+      <p>Never use the root account for daily work. In the AWS Console, go to <strong>IAM → Users → Create user</strong>.</p>
+      <p>Username: <code>bootcamp-admin</code><br>
+      Check "Provide user access to the AWS Management Console"<br>
+      Attach the <strong>AdministratorAccess</strong> policy directly (we'll lock this down in Week 1 Lab 1).</p>
+      <p>On the final screen, click <strong>Create access key</strong> → choose "Command Line Interface (CLI)" → create the key. Download the CSV or copy both values somewhere secure:</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">SAVE THESE — YOU'LL NEED THEM NEXT</span></div>
+        <div class="code-body">
+<pre><span class="cm"># Your values will be different</span>
+<span class="fl">Access Key ID:</span>     <span class="str">AKIAIOSFODNN7EXAMPLE</span>
+<span class="fl">Secret Access Key:</span> <span class="str">wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY</span></pre>
+        </div>
+      </div>
+      <div class="callout callout-warn">
+        <div class="cl-label">SECURITY NOTE</div>
+        <p>Never commit these keys to git, paste them in Slack, or store them in plain text files. We'll replace this admin user with a scoped one in Week 1 Lab 1.</p>
+      </div>
+    </div>
+
+    <div class="checkpoint">
+      <div class="cp-label">SECTION CHECKPOINT</div>
+      <ul>
+        <li>AWS Free Tier account created and verified</li>
+        <li>MFA enabled on root account</li>
+        <li>IAM admin user created with access key downloaded</li>
+      </ul>
+    </div>
+
+    <div class="nav-footer">
+      <div></div>
+      <button class="nav-btn primary" onclick="goToSection('cli')">NEXT: AWS CLI →</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 2: AWS CLI -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="section-content" id="sec-cli">
+    <div class="section-header">
+      <h2>2. AWS CLI v2</h2>
+      <div class="meta">Install the AWS command-line interface and configure credentials</div>
+    </div>
+
+    <div class="step" data-section="cli">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Install AWS CLI v2</h3>
+
+      <div class="os-code active" data-os="mac">
+        <div class="code-block">
+          <div class="code-header"><span class="code-label">macOS</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+          <div class="code-body">
+<pre><span class="pr">$</span> <span class="cmd">brew install awscli</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="os-code active" data-os="windows">
+        <div class="code-block">
+          <div class="code-header"><span class="code-label">WINDOWS (WSL/Ubuntu)</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+          <div class="code-body">
+<pre><span class="pr">$</span> <span class="cmd">sudo apt update && sudo apt install -y unzip curl</span>
+<span class="pr">$</span> <span class="cmd">curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"</span>
+<span class="pr">$</span> <span class="cmd">unzip awscliv2.zip</span>
+<span class="pr">$</span> <span class="cmd">sudo ./aws/install</span>
+<span class="pr">$</span> <span class="cmd">rm -rf awscliv2.zip aws/</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="os-code" data-os="linux">
+        <div class="code-block">
+          <div class="code-header"><span class="code-label">LINUX (Ubuntu/Debian)</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+          <div class="code-body">
+<pre><span class="pr">$</span> <span class="cmd">curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"</span>
+<span class="pr">$</span> <span class="cmd">unzip awscliv2.zip</span>
+<span class="pr">$</span> <span class="cmd">sudo ./aws/install</span>
+<span class="pr">$</span> <span class="cmd">rm -rf awscliv2.zip aws/</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" data-section="cli">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Verify installation</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">ALL PLATFORMS</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body">
+<pre><span class="pr">$</span> <span class="cmd">aws --version</span>
+<span class="out">aws-cli/2.x.x Python/3.x.x Linux/x86_64</span></pre>
+        </div>
+      </div>
+      <p>If it returns a version starting with <code>2.</code>, you're good. Version 1.x won't work for some labs.</p>
+    </div>
+
+    <div class="step" data-section="cli">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Configure credentials</h3>
+      <p>Use the Access Key ID and Secret Access Key from the previous section:</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">INTERACTIVE SETUP</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body">
+<pre><span class="pr">$</span> <span class="cmd">aws configure</span>
+<span class="cm">AWS Access Key ID [None]:</span> <span class="str">paste your Access Key ID</span>
+<span class="cm">AWS Secret Access Key [None]:</span> <span class="str">paste your Secret Access Key</span>
+<span class="cm">Default region name [None]:</span> <span class="str">us-east-1</span>
+<span class="cm">Default output format [None]:</span> <span class="str">json</span></pre>
+        </div>
+      </div>
+      <div class="callout callout-info">
+        <div class="cl-label">REGION</div>
+        <p>Use <strong>us-east-1</strong> for all labs. Some AWS services launch in us-east-1 first, and our IAM policies are scoped to this region. Stay consistent throughout the bootcamp.</p>
+      </div>
+    </div>
+
+    <div class="step" data-section="cli">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Test your credentials</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">VERIFY ACCESS</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body">
+<pre><span class="pr">$</span> <span class="cmd">aws sts get-caller-identity</span>
+<span class="out">{
+    "UserId": "AIDAEXAMPLEID",
+    "Account": "123456789012",
+    "Arn": "arn:aws:iam::123456789012:user/bootcamp-admin"
+}</span></pre>
+        </div>
+      </div>
+      <p>If you see your account ID and username, your CLI is configured correctly. If you get an error, double-check that you pasted the access key and secret key correctly.</p>
+    </div>
+
+    <div class="checkpoint">
+      <div class="cp-label">SECTION CHECKPOINT</div>
+      <ul>
+        <li>AWS CLI v2 installed (aws --version returns 2.x)</li>
+        <li>Credentials configured with aws configure</li>
+        <li>aws sts get-caller-identity returns your account info</li>
+      </ul>
+    </div>
+
+    <div class="nav-footer">
+      <button class="nav-btn" onclick="goToSection('aws')">← AWS ACCOUNT</button>
+      <button class="nav-btn primary" onclick="goToSection('terraform')">NEXT: TERRAFORM →</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 3: TERRAFORM -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="section-content" id="sec-terraform">
+    <div class="section-header">
+      <h2>3. Terraform</h2>
+      <div class="meta">Install HashiCorp Terraform for Infrastructure as Code (used in Week 2+)</div>
+    </div>
+
+    <div class="step" data-section="terraform">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Install Terraform</h3>
+
+      <div class="os-code active" data-os="mac">
+        <div class="code-block">
+          <div class="code-header"><span class="code-label">macOS</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+          <div class="code-body">
+<pre><span class="pr">$</span> <span class="cmd">brew tap hashicorp/tap</span>
+<span class="pr">$</span> <span class="cmd">brew install hashicorp/tap/terraform</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="os-code active" data-os="windows">
+        <div class="code-block">
+          <div class="code-header"><span class="code-label">WINDOWS (WSL/Ubuntu)</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+          <div class="code-body">
+<pre><span class="pr">$</span> <span class="cmd">sudo apt update && sudo apt install -y gnupg software-properties-common</span>
+<span class="pr">$</span> <span class="cmd">wget -O- https://apt.releases.hashicorp.com/gpg | \
+    gpg --dearmor | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg > /dev/null</span>
+<span class="pr">$</span> <span class="cmd">echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] \
+    https://apt.releases.hashicorp.com $(lsb_release -cs) main" | \
+    sudo tee /etc/apt/sources.list.d/hashicorp.list</span>
+<span class="pr">$</span> <span class="cmd">sudo apt update && sudo apt install -y terraform</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="os-code" data-os="linux">
+        <div class="code-block">
+          <div class="code-header"><span class="code-label">LINUX (Ubuntu/Debian)</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+          <div class="code-body">
+<pre><span class="pr">$</span> <span class="cmd">wget -O- https://apt.releases.hashicorp.com/gpg | \
+    gpg --dearmor | sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg > /dev/null</span>
+<span class="pr">$</span> <span class="cmd">echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] \
+    https://apt.releases.hashicorp.com $(lsb_release -cs) main" | \
+    sudo tee /etc/apt/sources.list.d/hashicorp.list</span>
+<span class="pr">$</span> <span class="cmd">sudo apt update && sudo apt install -y terraform</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" data-section="terraform">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Verify installation</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">ALL PLATFORMS</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body">
+<pre><span class="pr">$</span> <span class="cmd">terraform version</span>
+<span class="out">Terraform v1.x.x
+on linux_amd64</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-footer">
+      <button class="nav-btn" onclick="goToSection('cli')">← AWS CLI</button>
+      <button class="nav-btn primary" onclick="goToSection('docker')">NEXT: DOCKER →</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 4: DOCKER -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="section-content" id="sec-docker">
+    <div class="section-header">
+      <h2>4. Docker</h2>
+      <div class="meta">Install Docker Engine for container security labs (Week 3+)</div>
+    </div>
+
+    <div class="step" data-section="docker">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Install Docker</h3>
+
+      <div class="os-code active" data-os="mac">
+        <div class="code-block">
+          <div class="code-header"><span class="code-label">macOS</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+          <div class="code-body">
+<pre><span class="cm"># Download Docker Desktop from docker.com/products/docker-desktop</span>
+<span class="cm"># Or install via Homebrew:</span>
+<span class="pr">$</span> <span class="cmd">brew install --cask docker</span>
+<span class="cm"># Open Docker Desktop from Applications to start the daemon</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="os-code active" data-os="windows">
+        <div class="code-block">
+          <div class="code-header"><span class="code-label">WINDOWS (WSL/Ubuntu)</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+          <div class="code-body">
+<pre><span class="cm"># Option A: Install Docker Desktop for Windows (recommended)</span>
+<span class="cm"># Download from docker.com/products/docker-desktop</span>
+<span class="cm"># Enable WSL 2 integration in Docker Desktop settings</span>
+<span class="cm"></span>
+<span class="cm"># Option B: Install Docker Engine directly in WSL</span>
+<span class="pr">$</span> <span class="cmd">sudo apt update</span>
+<span class="pr">$</span> <span class="cmd">sudo apt install -y ca-certificates curl</span>
+<span class="pr">$</span> <span class="cmd">sudo install -m 0755 -d /etc/apt/keyrings</span>
+<span class="pr">$</span> <span class="cmd">sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
+    -o /etc/apt/keyrings/docker.asc</span>
+<span class="pr">$</span> <span class="cmd">echo "deb [arch=$(dpkg --print-architecture) \
+    signed-by=/etc/apt/keyrings/docker.asc] \
+    https://download.docker.com/linux/ubuntu \
+    $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+    sudo tee /etc/apt/sources.list.d/docker.list > /dev/null</span>
+<span class="pr">$</span> <span class="cmd">sudo apt update && sudo apt install -y docker-ce docker-ce-cli containerd.io</span>
+<span class="pr">$</span> <span class="cmd">sudo usermod -aG docker $USER</span>
+<span class="cm"># Log out and back in for group change to take effect</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="os-code" data-os="linux">
+        <div class="code-block">
+          <div class="code-header"><span class="code-label">LINUX (Ubuntu/Debian)</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+          <div class="code-body">
+<pre><span class="pr">$</span> <span class="cmd">sudo apt update</span>
+<span class="pr">$</span> <span class="cmd">sudo apt install -y ca-certificates curl</span>
+<span class="pr">$</span> <span class="cmd">sudo install -m 0755 -d /etc/apt/keyrings</span>
+<span class="pr">$</span> <span class="cmd">sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
+    -o /etc/apt/keyrings/docker.asc</span>
+<span class="pr">$</span> <span class="cmd">echo "deb [arch=$(dpkg --print-architecture) \
+    signed-by=/etc/apt/keyrings/docker.asc] \
+    https://download.docker.com/linux/ubuntu \
+    $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+    sudo tee /etc/apt/sources.list.d/docker.list > /dev/null</span>
+<span class="pr">$</span> <span class="cmd">sudo apt update && sudo apt install -y docker-ce docker-ce-cli containerd.io</span>
+<span class="pr">$</span> <span class="cmd">sudo usermod -aG docker $USER</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" data-section="docker">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Verify installation</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">ALL PLATFORMS</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body">
+<pre><span class="pr">$</span> <span class="cmd">docker --version</span>
+<span class="out">Docker version 27.x.x, build xxxxxxx</span>
+
+<span class="pr">$</span> <span class="cmd">docker run hello-world</span>
+<span class="out">Hello from Docker!
+This message shows that your installation appears to be working correctly.</span></pre>
+        </div>
+      </div>
+      <p>If <code>docker run</code> gives a permission error, either log out and back in (for the group change) or prefix with <code>sudo</code>.</p>
+    </div>
+
+    <div class="nav-footer">
+      <button class="nav-btn" onclick="goToSection('terraform')">← TERRAFORM</button>
+      <button class="nav-btn primary" onclick="goToSection('k8s')">NEXT: KUBECTL →</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 5: KUBECTL -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="section-content" id="sec-k8s">
+    <div class="section-header">
+      <h2>5. kubectl + kind</h2>
+      <div class="meta">Kubernetes CLI and local cluster tool (Week 4+)</div>
+    </div>
+
+    <div class="step" data-section="k8s">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Install kubectl</h3>
+
+      <div class="os-code active" data-os="mac">
+        <div class="code-block">
+          <div class="code-header"><span class="code-label">macOS</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+          <div class="code-body">
+<pre><span class="pr">$</span> <span class="cmd">brew install kubectl</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="os-code active" data-os="windows">
+        <div class="code-block">
+          <div class="code-header"><span class="code-label">WINDOWS (WSL/Ubuntu)</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+          <div class="code-body">
+<pre><span class="pr">$</span> <span class="cmd">curl -LO "https://dl.k8s.io/release/$(curl -L -s \
+    https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"</span>
+<span class="pr">$</span> <span class="cmd">sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl</span>
+<span class="pr">$</span> <span class="cmd">rm kubectl</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="os-code" data-os="linux">
+        <div class="code-block">
+          <div class="code-header"><span class="code-label">LINUX</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+          <div class="code-body">
+<pre><span class="pr">$</span> <span class="cmd">curl -LO "https://dl.k8s.io/release/$(curl -L -s \
+    https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"</span>
+<span class="pr">$</span> <span class="cmd">sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl</span>
+<span class="pr">$</span> <span class="cmd">rm kubectl</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" data-section="k8s">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Install kind (Kubernetes in Docker)</h3>
+      <p>kind lets you run local Kubernetes clusters inside Docker containers. We'll use it for Weeks 4–6 before moving to EKS.</p>
+
+      <div class="os-code active" data-os="mac">
+        <div class="code-block">
+          <div class="code-header"><span class="code-label">macOS</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+          <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">brew install kind</span></pre></div>
+        </div>
+      </div>
+
+      <div class="os-code active" data-os="windows">
+        <div class="code-block">
+          <div class="code-header"><span class="code-label">WINDOWS (WSL/Ubuntu) & LINUX</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+          <div class="code-body">
+<pre><span class="pr">$</span> <span class="cmd">[ $(uname -m) = x86_64 ] && curl -Lo ./kind \
+    https://kind.sigs.k8s.io/dl/v0.25.0/kind-linux-amd64</span>
+<span class="pr">$</span> <span class="cmd">chmod +x ./kind</span>
+<span class="pr">$</span> <span class="cmd">sudo mv ./kind /usr/local/bin/kind</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="os-code" data-os="linux">
+        <div class="code-block">
+          <div class="code-header"><span class="code-label">LINUX</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+          <div class="code-body">
+<pre><span class="pr">$</span> <span class="cmd">[ $(uname -m) = x86_64 ] && curl -Lo ./kind \
+    https://kind.sigs.k8s.io/dl/v0.25.0/kind-linux-amd64</span>
+<span class="pr">$</span> <span class="cmd">chmod +x ./kind</span>
+<span class="pr">$</span> <span class="cmd">sudo mv ./kind /usr/local/bin/kind</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" data-section="k8s">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Verify both tools</h3>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">ALL PLATFORMS</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body">
+<pre><span class="pr">$</span> <span class="cmd">kubectl version --client</span>
+<span class="out">Client Version: v1.x.x</span>
+
+<span class="pr">$</span> <span class="cmd">kind version</span>
+<span class="out">kind v0.25.0 go1.x.x linux/amd64</span></pre>
+        </div>
+      </div>
+      <div class="callout callout-info">
+        <div class="cl-label">NOTE</div>
+        <p>Don't create a kind cluster yet — we'll do that in Week 4 with specific security configurations. For now, just verify the binaries are installed.</p>
+      </div>
+    </div>
+
+    <div class="nav-footer">
+      <button class="nav-btn" onclick="goToSection('docker')">← DOCKER</button>
+      <button class="nav-btn primary" onclick="goToSection('verify')">NEXT: VERIFY ALL →</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 6: VERIFY ALL -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="section-content" id="sec-verify">
+    <div class="section-header">
+      <h2>6. Final Verification</h2>
+      <div class="meta">Run the complete verification script to confirm everything is ready</div>
+    </div>
+
+    <div class="step" data-section="verify">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Run the full verification script</h3>
+      <p>Copy and paste this entire block. It checks every tool in one shot:</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">FULL ENVIRONMENT CHECK</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body">
+<pre><span class="pr">$</span> <span class="cmd">echo "═══════════════════════════════════════"
+echo "RAPID CYBER AI — Environment Verification"
+echo "═══════════════════════════════════════"
+echo ""
+echo -n "AWS CLI:    " && aws --version 2>&1 | head -1 || echo "NOT INSTALLED"
+echo -n "AWS Auth:   " && aws sts get-caller-identity --query 'Arn' --output text 2>&1 || echo "NOT CONFIGURED"
+echo -n "Terraform:  " && terraform version 2>&1 | head -1 || echo "NOT INSTALLED"
+echo -n "Docker:     " && docker --version 2>&1 || echo "NOT INSTALLED"
+echo -n "kubectl:    " && kubectl version --client --short 2>&1 || echo "NOT INSTALLED"
+echo -n "kind:       " && kind version 2>&1 || echo "NOT INSTALLED"
+echo ""
+echo "═══════════════════════════════════════"
+echo "If all lines show versions, you're ready."
+echo "═══════════════════════════════════════"</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" data-section="verify">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Install bonus tools (optional but recommended)</h3>
+      <p>These tools are used in specific labs. You can install them now or when you reach those weeks:</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">OPTIONAL TOOLS</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body">
+<pre><span class="cm"># jq — JSON processor (used constantly)</span>
+<span class="pr">$</span> <span class="cmd">sudo apt install -y jq</span>
+
+<span class="cm"># Trivy — container image scanner (Week 3)</span>
+<span class="pr">$</span> <span class="cmd">sudo apt install -y wget apt-transport-https
+wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | \
+    gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
+echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] \
+    https://aquasecurity.github.io/trivy-repo/deb generic main" | \
+    sudo tee /etc/apt/sources.list.d/trivy.list
+sudo apt update && sudo apt install -y trivy</span>
+
+<span class="cm"># Checkov — IaC security scanner (Week 2)</span>
+<span class="pr">$</span> <span class="cmd">pip3 install checkov --break-system-packages</span>
+
+<span class="cm"># Helm — Kubernetes package manager (Week 4+)</span>
+<span class="pr">$</span> <span class="cmd">curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" data-section="verify">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Set up your text editor</h3>
+      <p>You'll be editing JSON, YAML, Terraform, and Dockerfiles throughout the bootcamp. VS Code with the following extensions is recommended:</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">VS CODE EXTENSIONS</span></div>
+        <div class="code-body">
+<pre><span class="fl">HashiCorp Terraform</span>    <span class="cm">— syntax highlighting + autocomplete for .tf files</span>
+<span class="fl">Docker</span>                 <span class="cm">— Dockerfile syntax + container management</span>
+<span class="fl">Kubernetes</span>             <span class="cm">— YAML validation for K8s manifests</span>
+<span class="fl">YAML</span>                   <span class="cm">— general YAML support</span>
+<span class="fl">AWS Toolkit</span>            <span class="cm">— AWS resource browsing (optional)</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="checkpoint">
+      <div class="cp-label">YOU'RE READY FOR WEEK 1</div>
+      <ul>
+        <li>AWS Free Tier account with MFA on root</li>
+        <li>IAM admin user with CLI access configured</li>
+        <li>AWS CLI v2 returning your account identity</li>
+        <li>Terraform installed and returning a version</li>
+        <li>Docker installed and running hello-world</li>
+        <li>kubectl and kind installed</li>
+        <li>Text editor set up with relevant extensions</li>
+      </ul>
+    </div>
+
+    <div class="nav-footer">
+      <button class="nav-btn" onclick="goToSection('k8s')">← KUBECTL</button>
+      <a class="nav-btn primary" href="Week1_Interactive_Lab_Portal.html">START WEEK 1 →</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ─── State ───
+let currentOS = 'windows';
+const sections = ['aws', 'cli', 'terraform', 'docker', 'k8s', 'verify'];
+
+// ─── OS Toggle ───
+function setOS(os) {
+  currentOS = os;
+  document.querySelectorAll('#globalOS .os-btn').forEach(b => b.classList.toggle('active', b.dataset.os === os));
+  document.querySelectorAll('.os-code').forEach(el => {
+    el.classList.toggle('active', el.dataset.os === os);
+  });
+}
+
+// ─── Section Navigation ───
+document.querySelectorAll('.sec-tab').forEach(tab => {
+  tab.addEventListener('click', () => goToSection(tab.dataset.sec));
+});
+
+function goToSection(sec) {
+  document.querySelectorAll('.sec-tab').forEach(t => t.classList.toggle('active', t.dataset.sec === sec));
+  document.querySelectorAll('.section-content').forEach(c => c.classList.toggle('active', c.id === 'sec-' + sec));
+  window.scrollTo({ top: 280, behavior: 'smooth' });
+}
+
+// ─── Step completion ───
+function toggleStep(el) {
+  el.classList.toggle('done');
+  el.textContent = el.classList.contains('done') ? '✓' : '';
+  el.closest('.step').classList.toggle('completed');
+  updateProgress();
+  updateSectionTabs();
+}
+
+function updateProgress() {
+  const total = document.querySelectorAll('.step-check').length;
+  const done = document.querySelectorAll('.step-check.done').length;
+  const pct = total > 0 ? (done / total) * 100 : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `${done} of ${total} steps completed` + (pct === 100 ? ' — READY FOR WEEK 1' : '');
+}
+
+function updateSectionTabs() {
+  sections.forEach(sec => {
+    const steps = document.querySelectorAll(`.step[data-section="${sec}"] .step-check`);
+    const done = document.querySelectorAll(`.step[data-section="${sec}"] .step-check.done`);
+    const tab = document.querySelector(`.sec-tab[data-sec="${sec}"]`);
+    if (steps.length > 0 && done.length === steps.length) {
+      tab.classList.add('completed');
+    } else {
+      tab.classList.remove('completed');
+    }
+  });
+}
+
+// ─── Copy code ───
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  const text = pre.textContent.replace(/COPY$/, '').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'COPIED';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// Init
+setOS('windows');
+updateProgress();
+</script>
+</body>
+</html>

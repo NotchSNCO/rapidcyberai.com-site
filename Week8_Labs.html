@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Week 8: Capstone Project — RAPID CYBER AI</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root { --blood: #8B0000; --crimson: #DC143C; --scarlet: #FF2D2D; --void: #0A0A0A; --carbon: #111; --steel: #1A1A1A; --ash: #222; --smoke: #888; --bone: #CCC; --text: #E0E0E0; --white: #F5F5F5; --accent: #00D4AA; --warn: #F59E0B; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'DM Sans', sans-serif; background: var(--void); color: var(--text); line-height: 1.7; }
+.header { background: var(--carbon); border-bottom: 2px solid var(--blood); padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand svg { width: 32px; height: 32px; }
+.brand span { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: var(--crimson); letter-spacing: 2px; }
+.header-meta { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--smoke); letter-spacing: 1px; }
+.progress-wrap { width: 100%; background: var(--ash); height: 3px; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--blood), var(--crimson)); width: 0%; transition: width 0.6s ease; }
+.progress-text { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--smoke); text-align: center; padding: 6px 0; background: var(--carbon); border-bottom: 1px solid var(--ash); }
+.container { max-width: 880px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+.hero { text-align: center; padding: 2.5rem 0; border-bottom: 1px solid var(--ash); margin-bottom: 2rem; }
+.hero-badge { display: inline-block; padding: 4px 14px; border: 1px solid var(--blood); border-radius: 20px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--crimson); letter-spacing: 2px; margin-bottom: 0.75rem; }
+.hero h1 { font-family: 'JetBrains Mono', monospace; font-size: 26px; color: var(--white); font-weight: 700; margin-bottom: 0.5rem; }
+.hero h1 span { color: var(--crimson); }
+.hero .sub { font-size: 14px; color: var(--smoke); }
+.hero .time { display: inline-flex; align-items: center; gap: 6px; margin-top: 0.75rem; padding: 6px 16px; background: var(--steel); border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--bone); }
+.hero .time .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--crimson); }
+.section-nav { display: flex; gap: 4px; margin-bottom: 2rem; flex-wrap: wrap; background: var(--carbon); padding: 6px; border-radius: 6px; border: 1px solid var(--ash); }
+.sec-tab { flex: 1; min-width: 80px; padding: 8px 8px; background: transparent; border: none; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--smoke); cursor: pointer; transition: all 0.2s; letter-spacing: 0.5px; text-align: center; }
+.sec-tab:hover { background: var(--steel); color: var(--bone); }
+.sec-tab.active { background: var(--blood); color: white; }
+.sec-tab .tab-check { display: inline-block; margin-right: 3px; opacity: 0; transition: opacity 0.3s; }
+.sec-tab.completed .tab-check { opacity: 1; color: var(--accent); }
+.section-content { display: none; animation: fadeIn 0.3s ease; }
+.section-content.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.section-header { margin-bottom: 1.5rem; }
+.section-header h2 { font-family: 'JetBrains Mono', monospace; font-size: 18px; color: var(--crimson); font-weight: 700; margin-bottom: 0.25rem; }
+.section-header .meta { font-size: 13px; color: var(--smoke); }
+.step { margin-bottom: 1.75rem; border-left: 2px solid var(--ash); padding-left: 1.25rem; position: relative; transition: all 0.3s; }
+.step::before { content: ''; position: absolute; left: -6px; top: 6px; width: 10px; height: 10px; background: var(--blood); border-radius: 50%; border: 2px solid var(--void); transition: all 0.3s; }
+.step.completed { border-left-color: var(--accent); }
+.step.completed::before { background: var(--accent); }
+.step h3 { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--bone); font-weight: 600; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 8px; }
+.step-check { width: 20px; height: 20px; border: 1.5px solid var(--ash); border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; font-size: 12px; color: transparent; user-select: none; }
+.step-check:hover { border-color: var(--crimson); }
+.step-check.done { background: var(--accent); border-color: var(--accent); color: var(--void); }
+.step p { font-size: 13px; color: var(--smoke); margin-bottom: 0.5rem; }
+.code-block { background: var(--void); border: 1px solid var(--ash); border-radius: 6px; margin: 0.75rem 0; position: relative; overflow: hidden; }
+.code-header { display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; background: var(--steel); border-bottom: 1px solid var(--ash); }
+.code-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--smoke); letter-spacing: 1px; }
+.copy-btn { background: var(--ash); border: 1px solid #333; color: var(--smoke); font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 2px 10px; border-radius: 3px; cursor: pointer; transition: all 0.2s; letter-spacing: 1px; }
+.copy-btn:hover { background: var(--blood); border-color: var(--blood); color: white; }
+.copy-btn.copied { background: var(--accent); border-color: var(--accent); color: var(--void); }
+.code-body { padding: 0.75rem 1rem; overflow-x: auto; }
+.code-body pre { font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.8; white-space: pre-wrap; word-break: break-word; }
+.pr { color: var(--crimson); } .cmd { color: #E2E8F0; } .cm { color: #555; }
+.callout { border-left: 3px solid; border-radius: 0 6px 6px 0; padding: 0.9rem 1rem; margin: 0.75rem 0; }
+.callout .cl-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 2px; font-weight: 700; margin-bottom: 0.25rem; }
+.callout p { font-size: 12px; margin-bottom: 0; }
+.callout-warn { background: #1A1400; border-color: var(--warn); }
+.callout-warn .cl-label { color: var(--warn); }
+.nav-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 2rem; border-top: 1px solid var(--ash); margin-top: 2rem; }
+.nav-btn { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--steel); border: 1px solid var(--ash); border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--bone); cursor: pointer; transition: all 0.2s; text-decoration: none; letter-spacing: 1px; }
+.nav-btn:hover { border-color: var(--crimson); color: var(--crimson); }
+.nav-btn.primary { background: var(--blood); border-color: var(--blood); color: white; }
+.nav-btn.primary:hover { background: var(--crimson); border-color: var(--crimson); }
+@media (max-width: 640px) { .container { padding: 1rem; } .section-nav { flex-direction: column; } .hero h1 { font-size: 20px; } }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="brand">
+    <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><path d="M28 4 L52 16 L52 40 L28 52 L4 40 L4 16 Z" fill="none" stroke="#DC143C" stroke-width="2"/><path d="M28 8 L48 18 L48 38 L28 48 L8 38 L8 18 Z" fill="#8B0000" opacity="0.3"/><circle cx="28" cy="20" r="3" fill="#DC143C"/><circle cx="20" cy="30" r="2.5" fill="#DC143C" opacity="0.7"/><circle cx="36" cy="30" r="2.5" fill="#DC143C" opacity="0.7"/><circle cx="28" cy="37" r="2.5" fill="#DC143C" opacity="0.8"/><line x1="28" y1="20" x2="20" y2="30" stroke="#DC143C" stroke-width="0.7" opacity="0.4"/><line x1="28" y1="20" x2="36" y2="30" stroke="#DC143C" stroke-width="0.7" opacity="0.4"/><line x1="20" y1="30" x2="28" y2="37" stroke="#DC143C" stroke-width="0.7" opacity="0.4"/><line x1="36" y1="30" x2="28" y2="37" stroke="#DC143C" stroke-width="0.7" opacity="0.4"/><rect x="24" y="42" width="8" height="2" fill="#DC143C" opacity="0.8"/></svg>
+    <span>RAPID CYBER AI</span>
+  </div>
+  <span class="header-meta">WEEK 8 OF 8</span>
+</div>
+<div class="progress-wrap"><div class="progress-fill" id="progressFill"></div></div>
+<div class="progress-text" id="progressText">0 steps completed</div>
+<div class="container">
+  <div class="hero">
+    <div class="hero-badge">WEEK 8</div>
+    <h1><span>Capstone Project</span></h1>
+    <p class="sub">Production-grade secure cloud application — your portfolio artifact</p>
+    <div class="time"><span class="dot"></span> 10-12 hours</div>
+  </div>
+  <div class="section-nav" id="sectionNav">
+    <button class="sec-tab active" data-sec="design"><span class="tab-check">✓</span>ARCHITECTURE</button>
+    <button class="sec-tab " data-sec="infra"><span class="tab-check">✓</span>INFRASTRUCTURE</button>
+    <button class="sec-tab " data-sec="app"><span class="tab-check">✓</span>APPLICATION</button>
+    <button class="sec-tab " data-sec="validate"><span class="tab-check">✓</span>VALIDATION</button>
+    <button class="sec-tab " data-sec="portfolio"><span class="tab-check">✓</span>PORTFOLIO</button>
+  </div>
+
+  <div class="section-content active" id="sec-design">
+    <div class="section-header">
+      <h2>Lab 1: Capstone Architecture & Design</h2>
+      <div class="meta">~60 min</div>
+    </div>
+    
+    <div class="step" data-section="design">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Design the application architecture</h3>
+      <p>Three-tier application with security controls mapped to every layer.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Architecture</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">cat &gt; architecture.md &lt;&lt; 'EOF'</span>
+<span class="cm"># Capstone Architecture</span>
+<span class="cmd"></span>
+<span class="cmd">## Application</span>
+<span class="cmd">- Frontend: React (CloudFront → ALB → EKS)</span>
+<span class="cmd">- Backend: Python FastAPI (EKS, private)</span>
+<span class="cmd">- Database: PostgreSQL (RDS, private subnet)</span>
+<span class="cmd"></span>
+<span class="cmd">## Security Controls</span>
+<span class="cmd">- Network: VPC segmentation, NetworkPolicies, WAF</span>
+<span class="cmd">- Identity: IRSA, RBAC, mTLS via Istio</span>
+<span class="cmd">- Data: KMS encryption at rest, TLS in transit</span>
+<span class="cmd">- Compute: PSS restricted, Falco, Gatekeeper</span>
+<span class="cmd">- CI/CD: SAST, SCA, image scanning, signing</span>
+<span class="cmd">- Monitoring: CloudTrail, GuardDuty, Prometheus</span>
+<span class="cmd">EOF</span></pre></div>
+      </div>
+    </div>
+    <div class="nav-footer">
+      <div></div>
+      <button class="nav-btn primary" onclick="goToSection('infra')">NEXT LAB →</button>
+    </div>
+  </div>
+  <div class="section-content " id="sec-infra">
+    <div class="section-header">
+      <h2>Lab 2: Infrastructure Deployment</h2>
+      <div class="meta">~90 min</div>
+    </div>
+    
+    <div class="step" data-section="infra">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Deploy full infrastructure with Terraform</h3>
+      <p>Everything from Weeks 1-7 deployed together as a production environment.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Deploy</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">cd capstone-project/terraform</span>
+<span class="pr">$</span> <span class="cmd">terraform init</span>
+<span class="pr">$</span> <span class="cmd">terraform plan -out=tfplan</span>
+<span class="cmd"></span>
+<span class="cm"># Review the plan — should create:</span>
+<span class="cm"># VPC, EKS, RDS, ECR, KMS, CloudTrail, GuardDuty</span>
+<span class="pr">$</span> <span class="cmd">terraform apply tfplan</span>
+<span class="cmd"></span>
+<span class="cm"># Install security infrastructure</span>
+<span class="pr">$</span> <span class="cmd">helm install istio istio/istiod -n istio-system --create-namespace</span>
+<span class="pr">$</span> <span class="cmd">helm install falco falcosecurity/falco -n falco --create-namespace</span>
+<span class="pr">$</span> <span class="cmd">helm install gatekeeper gatekeeper/gatekeeper -n gatekeeper-system --create-namespace</span></pre></div>
+      </div>
+    </div>
+    <div class="nav-footer">
+      <button class="nav-btn" onclick="goToSection('design')">← PREV LAB</button>
+      <button class="nav-btn primary" onclick="goToSection('app')">NEXT LAB →</button>
+    </div>
+  </div>
+  <div class="section-content " id="sec-app">
+    <div class="section-header">
+      <h2>Lab 3: Application Deployment</h2>
+      <div class="meta">~90 min</div>
+    </div>
+    
+    <div class="step" data-section="app">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Build, scan, sign, and deploy</h3>
+      <p>Images are scanned, signed, and deployed with full security controls.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Full pipeline</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="cm"># Build hardened images</span>
+<span class="pr">$</span> <span class="cmd">docker build -t $ECR_REPO/frontend:v1 ./frontend</span>
+<span class="pr">$</span> <span class="cmd">docker build -t $ECR_REPO/backend:v1 ./backend</span>
+<span class="cmd"></span>
+<span class="cm"># Scan</span>
+<span class="pr">$</span> <span class="cmd">trivy image --exit-code 1 --severity HIGH,CRITICAL $ECR_REPO/frontend:v1</span>
+<span class="pr">$</span> <span class="cmd">trivy image --exit-code 1 --severity HIGH,CRITICAL $ECR_REPO/backend:v1</span>
+<span class="cmd"></span>
+<span class="cm"># Push and sign</span>
+<span class="pr">$</span> <span class="cmd">docker push $ECR_REPO/frontend:v1</span>
+<span class="pr">$</span> <span class="cmd">docker push $ECR_REPO/backend:v1</span>
+<span class="pr">$</span> <span class="cmd">cosign sign --yes $ECR_REPO/frontend:v1</span>
+<span class="pr">$</span> <span class="cmd">cosign sign --yes $ECR_REPO/backend:v1</span>
+<span class="cmd"></span>
+<span class="cm"># Deploy to EKS</span>
+<span class="pr">$</span> <span class="cmd">kubectl apply -f k8s/</span>
+<span class="cmd"></span>
+<span class="cm"># Verify</span>
+<span class="pr">$</span> <span class="cmd">kubectl get pods -n bootcamp-app</span>
+<span class="pr">$</span> <span class="cmd">kubectl get svc -n bootcamp-app</span></pre></div>
+      </div>
+    </div>
+    <div class="nav-footer">
+      <button class="nav-btn" onclick="goToSection('infra')">← PREV LAB</button>
+      <button class="nav-btn primary" onclick="goToSection('validate')">NEXT LAB →</button>
+    </div>
+  </div>
+  <div class="section-content " id="sec-validate">
+    <div class="section-header">
+      <h2>Lab 4: Security Validation</h2>
+      <div class="meta">~60 min</div>
+    </div>
+    
+    <div class="step" data-section="validate">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Run the full security audit</h3>
+      <p>Audit every layer. Simulate attacks. Document findings.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Comprehensive audit</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="cm"># IAM audit</span>
+<span class="pr">$</span> <span class="cmd">aws iam get-account-authorization-details | jq '.UserDetailList[].AttachedManagedPolicies'</span>
+<span class="cmd"></span>
+<span class="cm"># Network audit  </span>
+<span class="pr">$</span> <span class="cmd">kubectl get networkpolicies -A</span>
+<span class="pr">$</span> <span class="cmd">aws ec2 describe-security-groups --query 'SecurityGroups[*].{Name:GroupName,Ingress:IpPermissions}'</span>
+<span class="cmd"></span>
+<span class="cm"># Container audit</span>
+<span class="pr">$</span> <span class="cmd">trivy image $ECR_REPO/frontend:v1</span>
+<span class="pr">$</span> <span class="cmd">trivy image $ECR_REPO/backend:v1</span>
+<span class="cmd"></span>
+<span class="cm"># K8s audit</span>
+<span class="pr">$</span> <span class="cmd">kubectl get pods -A -o json | jq '.items[].spec.containers[].securityContext'</span>
+<span class="cmd"></span>
+<span class="cm"># CIS Benchmark</span>
+<span class="pr">$</span> <span class="cmd">kubectl apply -f kube-bench-job.yaml</span>
+<span class="pr">$</span> <span class="cmd">kubectl logs job/kube-bench | tail -20</span>
+<span class="cmd"></span>
+<span class="cm"># Simulated attack: try to bypass controls</span>
+<span class="pr">$</span> <span class="cmd">kubectl run attacker --image=busybox -n bootcamp-app -- sh</span>
+<span class="cm"># Should be rejected by PSS + Gatekeeper</span></pre></div>
+      </div>
+    </div>
+    <div class="nav-footer">
+      <button class="nav-btn" onclick="goToSection('app')">← PREV LAB</button>
+      <button class="nav-btn primary" onclick="goToSection('portfolio')">NEXT LAB →</button>
+    </div>
+  </div>
+  <div class="section-content " id="sec-portfolio">
+    <div class="section-header">
+      <h2>Lab 5: Portfolio Documentation</h2>
+      <div class="meta">~60 min</div>
+    </div>
+    
+    <div class="step" data-section="portfolio">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Package your capstone</h3>
+      <p>This README, your code, and your security validation report are your interview portfolio.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Portfolio</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">cat &gt; README.md &lt;&lt; 'EOF'</span>
+<span class="cm"># Cloud Security Engineering — Capstone Project</span>
+<span class="cmd"></span>
+<span class="cmd">## Architecture</span>
+<span class="cmd">[Architecture diagram]</span>
+<span class="cmd"></span>
+<span class="cmd">## Security Controls</span>
+<span class="cmd">| Layer | Control | Evidence |</span>
+<span class="cmd">|-------|---------|----------|</span>
+<span class="cmd">| Network | VPC segmentation + NetworkPolicies | Flow logs, policy YAMLs |</span>
+<span class="cmd">| Identity | IRSA + RBAC + mTLS | IAM roles, RBAC audit |</span>
+<span class="cmd">| Data | KMS encryption + TLS | Config check |</span>
+<span class="cmd">| Compute | PSS restricted + Falco | Pod security audit |</span>
+<span class="cmd">| CI/CD | SAST + SCA + signing | Pipeline logs |</span>
+<span class="cmd">| Monitoring | CloudTrail + GuardDuty | Alert history |</span>
+<span class="cmd"></span>
+<span class="cmd">## Threat Model</span>
+<span class="cmd">[STRIDE analysis with controls mapping]</span>
+<span class="cmd"></span>
+<span class="cmd">## Validation</span>
+<span class="cmd">[CIS benchmark results, simulated attack outcomes]</span>
+<span class="cmd">EOF</span>
+<span class="cmd"></span>
+<span class="cm"># Push to GitHub</span>
+<span class="pr">$</span> <span class="cmd">git add . &amp;&amp; git commit -m 'Capstone complete'</span>
+<span class="pr">$</span> <span class="cmd">git push origin main</span></pre></div>
+      </div>
+    </div>
+    <div class="step" data-section="portfolio">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Bootcamp complete</h3>
+      <p>You've built a production-grade secure cloud application from scratch. You've hardened IAM, VPCs, containers, Kubernetes, CI/CD pipelines, and implemented Zero Trust, threat modeling, and automated incident response. This is the skillset that commands $130K-$180K. Go get it.</p>
+    </div>
+    <div class="nav-footer">
+      <button class="nav-btn" onclick="goToSection('validate')">← PREV LAB</button>
+      <span class="nav-btn primary" style="background:var(--accent);border-color:var(--accent);">BOOTCAMP COMPLETE ✓</span>
+    </div>
+  </div>
+</div>
+<script>
+const sections = ["design", "infra", "app", "validate", "portfolio"];
+document.querySelectorAll('.sec-tab').forEach(tab => {
+  tab.addEventListener('click', () => goToSection(tab.dataset.sec));
+});
+function goToSection(sec) {
+  document.querySelectorAll('.sec-tab').forEach(t => t.classList.toggle('active', t.dataset.sec === sec));
+  document.querySelectorAll('.section-content').forEach(c => c.classList.toggle('active', c.id === 'sec-' + sec));
+  window.scrollTo({ top: 280, behavior: 'smooth' });
+}
+function toggleStep(el) {
+  el.classList.toggle('done');
+  el.textContent = el.classList.contains('done') ? '✓' : '';
+  el.closest('.step').classList.toggle('completed');
+  updateProgress(); updateSectionTabs();
+}
+function updateProgress() {
+  const total = document.querySelectorAll('.step-check').length;
+  const done = document.querySelectorAll('.step-check.done').length;
+  document.getElementById('progressFill').style.width = (total > 0 ? (done/total)*100 : 0) + '%';
+  document.getElementById('progressText').textContent = done + ' of ' + total + ' steps completed' + (done === total && total > 0 ? ' — WEEK 8 COMPLETE' : '');
+}
+function updateSectionTabs() {
+  sections.forEach(sec => {
+    const steps = document.querySelectorAll('.step[data-section="'+sec+'"] .step-check');
+    const done = document.querySelectorAll('.step[data-section="'+sec+'"] .step-check.done');
+    const tab = document.querySelector('.sec-tab[data-sec="'+sec+'"]');
+    if (steps.length > 0 && done.length === steps.length) tab.classList.add('completed');
+    else tab.classList.remove('completed');
+  });
+}
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.textContent.replace(/COPY$/, '').trim()).then(() => {
+    btn.textContent = 'COPIED'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+updateProgress();
+</script>
+</body>
+</html>

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Week 7: Advanced Security Patterns — RAPID CYBER AI</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root { --blood: #8B0000; --crimson: #DC143C; --scarlet: #FF2D2D; --void: #0A0A0A; --carbon: #111; --steel: #1A1A1A; --ash: #222; --smoke: #888; --bone: #CCC; --text: #E0E0E0; --white: #F5F5F5; --accent: #00D4AA; --warn: #F59E0B; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'DM Sans', sans-serif; background: var(--void); color: var(--text); line-height: 1.7; }
+.header { background: var(--carbon); border-bottom: 2px solid var(--blood); padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand svg { width: 32px; height: 32px; }
+.brand span { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: var(--crimson); letter-spacing: 2px; }
+.header-meta { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--smoke); letter-spacing: 1px; }
+.progress-wrap { width: 100%; background: var(--ash); height: 3px; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--blood), var(--crimson)); width: 0%; transition: width 0.6s ease; }
+.progress-text { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--smoke); text-align: center; padding: 6px 0; background: var(--carbon); border-bottom: 1px solid var(--ash); }
+.container { max-width: 880px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+.hero { text-align: center; padding: 2.5rem 0; border-bottom: 1px solid var(--ash); margin-bottom: 2rem; }
+.hero-badge { display: inline-block; padding: 4px 14px; border: 1px solid var(--blood); border-radius: 20px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--crimson); letter-spacing: 2px; margin-bottom: 0.75rem; }
+.hero h1 { font-family: 'JetBrains Mono', monospace; font-size: 26px; color: var(--white); font-weight: 700; margin-bottom: 0.5rem; }
+.hero h1 span { color: var(--crimson); }
+.hero .sub { font-size: 14px; color: var(--smoke); }
+.hero .time { display: inline-flex; align-items: center; gap: 6px; margin-top: 0.75rem; padding: 6px 16px; background: var(--steel); border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--bone); }
+.hero .time .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--crimson); }
+.section-nav { display: flex; gap: 4px; margin-bottom: 2rem; flex-wrap: wrap; background: var(--carbon); padding: 6px; border-radius: 6px; border: 1px solid var(--ash); }
+.sec-tab { flex: 1; min-width: 80px; padding: 8px 8px; background: transparent; border: none; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--smoke); cursor: pointer; transition: all 0.2s; letter-spacing: 0.5px; text-align: center; }
+.sec-tab:hover { background: var(--steel); color: var(--bone); }
+.sec-tab.active { background: var(--blood); color: white; }
+.sec-tab .tab-check { display: inline-block; margin-right: 3px; opacity: 0; transition: opacity 0.3s; }
+.sec-tab.completed .tab-check { opacity: 1; color: var(--accent); }
+.section-content { display: none; animation: fadeIn 0.3s ease; }
+.section-content.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.section-header { margin-bottom: 1.5rem; }
+.section-header h2 { font-family: 'JetBrains Mono', monospace; font-size: 18px; color: var(--crimson); font-weight: 700; margin-bottom: 0.25rem; }
+.section-header .meta { font-size: 13px; color: var(--smoke); }
+.step { margin-bottom: 1.75rem; border-left: 2px solid var(--ash); padding-left: 1.25rem; position: relative; transition: all 0.3s; }
+.step::before { content: ''; position: absolute; left: -6px; top: 6px; width: 10px; height: 10px; background: var(--blood); border-radius: 50%; border: 2px solid var(--void); transition: all 0.3s; }
+.step.completed { border-left-color: var(--accent); }
+.step.completed::before { background: var(--accent); }
+.step h3 { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--bone); font-weight: 600; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 8px; }
+.step-check { width: 20px; height: 20px; border: 1.5px solid var(--ash); border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; font-size: 12px; color: transparent; user-select: none; }
+.step-check:hover { border-color: var(--crimson); }
+.step-check.done { background: var(--accent); border-color: var(--accent); color: var(--void); }
+.step p { font-size: 13px; color: var(--smoke); margin-bottom: 0.5rem; }
+.code-block { background: var(--void); border: 1px solid var(--ash); border-radius: 6px; margin: 0.75rem 0; position: relative; overflow: hidden; }
+.code-header { display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; background: var(--steel); border-bottom: 1px solid var(--ash); }
+.code-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--smoke); letter-spacing: 1px; }
+.copy-btn { background: var(--ash); border: 1px solid #333; color: var(--smoke); font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 2px 10px; border-radius: 3px; cursor: pointer; transition: all 0.2s; letter-spacing: 1px; }
+.copy-btn:hover { background: var(--blood); border-color: var(--blood); color: white; }
+.copy-btn.copied { background: var(--accent); border-color: var(--accent); color: var(--void); }
+.code-body { padding: 0.75rem 1rem; overflow-x: auto; }
+.code-body pre { font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.8; white-space: pre-wrap; word-break: break-word; }
+.pr { color: var(--crimson); } .cmd { color: #E2E8F0; } .cm { color: #555; }
+.callout { border-left: 3px solid; border-radius: 0 6px 6px 0; padding: 0.9rem 1rem; margin: 0.75rem 0; }
+.callout .cl-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 2px; font-weight: 700; margin-bottom: 0.25rem; }
+.callout p { font-size: 12px; margin-bottom: 0; }
+.callout-warn { background: #1A1400; border-color: var(--warn); }
+.callout-warn .cl-label { color: var(--warn); }
+.nav-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 2rem; border-top: 1px solid var(--ash); margin-top: 2rem; }
+.nav-btn { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--steel); border: 1px solid var(--ash); border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--bone); cursor: pointer; transition: all 0.2s; text-decoration: none; letter-spacing: 1px; }
+.nav-btn:hover { border-color: var(--crimson); color: var(--crimson); }
+.nav-btn.primary { background: var(--blood); border-color: var(--blood); color: white; }
+.nav-btn.primary:hover { background: var(--crimson); border-color: var(--crimson); }
+@media (max-width: 640px) { .container { padding: 1rem; } .section-nav { flex-direction: column; } .hero h1 { font-size: 20px; } }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="brand">
+    <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg"><path d="M28 4 L52 16 L52 40 L28 52 L4 40 L4 16 Z" fill="none" stroke="#DC143C" stroke-width="2"/><path d="M28 8 L48 18 L48 38 L28 48 L8 38 L8 18 Z" fill="#8B0000" opacity="0.3"/><circle cx="28" cy="20" r="3" fill="#DC143C"/><circle cx="20" cy="30" r="2.5" fill="#DC143C" opacity="0.7"/><circle cx="36" cy="30" r="2.5" fill="#DC143C" opacity="0.7"/><circle cx="28" cy="37" r="2.5" fill="#DC143C" opacity="0.8"/><line x1="28" y1="20" x2="20" y2="30" stroke="#DC143C" stroke-width="0.7" opacity="0.4"/><line x1="28" y1="20" x2="36" y2="30" stroke="#DC143C" stroke-width="0.7" opacity="0.4"/><line x1="20" y1="30" x2="28" y2="37" stroke="#DC143C" stroke-width="0.7" opacity="0.4"/><line x1="36" y1="30" x2="28" y2="37" stroke="#DC143C" stroke-width="0.7" opacity="0.4"/><rect x="24" y="42" width="8" height="2" fill="#DC143C" opacity="0.8"/></svg>
+    <span>RAPID CYBER AI</span>
+  </div>
+  <span class="header-meta">WEEK 7 OF 8</span>
+</div>
+<div class="progress-wrap"><div class="progress-fill" id="progressFill"></div></div>
+<div class="progress-text" id="progressText">0 steps completed</div>
+<div class="container">
+  <div class="hero">
+    <div class="hero-badge">WEEK 7</div>
+    <h1><span>Advanced Security Patterns</span></h1>
+    <p class="sub">Zero Trust, threat modeling, automated incident response</p>
+    <div class="time"><span class="dot"></span> 8-10 hours</div>
+  </div>
+  <div class="section-nav" id="sectionNav">
+    <button class="sec-tab active" data-sec="zero-trust"><span class="tab-check">✓</span>ZERO TRUST</button>
+    <button class="sec-tab " data-sec="stride"><span class="tab-check">✓</span>THREAT MODEL</button>
+    <button class="sec-tab " data-sec="ir"><span class="tab-check">✓</span>INCIDENT RESPONSE</button>
+    <button class="sec-tab " data-sec="monitoring"><span class="tab-check">✓</span>MONITORING</button>
+    <button class="sec-tab " data-sec="automation"><span class="tab-check">✓</span>AUTOMATION</button>
+  </div>
+
+  <div class="section-content active" id="sec-zero-trust">
+    <div class="section-header">
+      <h2>Lab 1: Zero Trust Architecture</h2>
+      <div class="meta">~90 min</div>
+    </div>
+    
+    <div class="step" data-section="zero-trust">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Implement identity-based access</h3>
+      <p>Allow traffic based on service identity, not IP address. Works even if pods move between nodes.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Zero Trust</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="cm"># Istio AuthorizationPolicy — identity-based, not network-based</span>
+<span class="pr">$</span> <span class="cmd">cat &gt; authz-policy.yaml &lt;&lt; 'EOF'</span>
+<span class="cmd">apiVersion: security.istio.io/v1beta1</span>
+<span class="cmd">kind: AuthorizationPolicy</span>
+<span class="cmd">metadata:</span>
+<span class="cmd">  name: backend-policy</span>
+<span class="cmd">  namespace: bootcamp-app</span>
+<span class="cmd">spec:</span>
+<span class="cmd">  selector:</span>
+<span class="cmd">    matchLabels:</span>
+<span class="cmd">      app: backend</span>
+<span class="cmd">  action: ALLOW</span>
+<span class="cmd">  rules:</span>
+<span class="cmd">  - from:</span>
+<span class="cmd">    - source:</span>
+<span class="cmd">        principals: ["cluster.local/ns/bootcamp-app/sa/frontend"]</span>
+<span class="cmd">    to:</span>
+<span class="cmd">    - operation:</span>
+<span class="cmd">        methods: ["GET", "POST"]</span>
+<span class="cmd">        paths: ["/api/*"]</span>
+<span class="cmd">EOF</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">kubectl apply -f authz-policy.yaml</span></pre></div>
+      </div>
+      <div class="callout callout-warn">
+        <div class="cl-label">WHY THIS MATTERS</div>
+        <p>Zero Trust means never trust, always verify. Every request is authenticated regardless of where it originates — inside or outside the cluster.</p>
+      </div>
+    </div>
+    <div class="nav-footer">
+      <div></div>
+      <button class="nav-btn primary" onclick="goToSection('stride')">NEXT LAB →</button>
+    </div>
+  </div>
+  <div class="section-content " id="sec-stride">
+    <div class="section-header">
+      <h2>Lab 2: STRIDE Threat Modeling</h2>
+      <div class="meta">~60 min</div>
+    </div>
+    
+    <div class="step" data-section="stride">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Build the threat model</h3>
+      <p>Map every STRIDE threat to a control you've built. This is your risk register.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">STRIDE analysis</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">cat &gt; threat-model.md &lt;&lt; 'EOF'</span>
+<span class="cm"># STRIDE Threat Model — Bootcamp Application</span>
+<span class="cmd"></span>
+<span class="cmd">## Components</span>
+<span class="cmd">- User Browser → CloudFront → ALB → Frontend pods</span>
+<span class="cmd">- Frontend → Backend API → PostgreSQL RDS</span>
+<span class="cmd"></span>
+<span class="cmd">## Threats &amp; Controls</span>
+<span class="cmd">| Threat | Category | Control | Status |</span>
+<span class="cmd">|--------|----------|---------|--------|</span>
+<span class="cmd">| Service impersonation | Spoofing | Istio mTLS | ✓ |</span>
+<span class="cmd">| Data in transit | Tampering | TLS everywhere | ✓ |</span>
+<span class="cmd">| Unaudited actions | Repudiation | CloudTrail + K8s audit | ✓ |</span>
+<span class="cmd">| Secret exposure | Info Disclosure | ESO + KMS encryption | ✓ |</span>
+<span class="cmd">| Resource exhaustion | DoS | LimitRange + Quotas | ✓ |</span>
+<span class="cmd">| Container escape | Elev. of Privilege | PSS restricted + Falco | ✓ |</span>
+<span class="cmd">EOF</span></pre></div>
+      </div>
+    </div>
+    <div class="nav-footer">
+      <button class="nav-btn" onclick="goToSection('zero-trust')">← PREV LAB</button>
+      <button class="nav-btn primary" onclick="goToSection('ir')">NEXT LAB →</button>
+    </div>
+  </div>
+  <div class="section-content " id="sec-ir">
+    <div class="section-header">
+      <h2>Lab 3: Automated Incident Response</h2>
+      <div class="meta">~90 min</div>
+    </div>
+    
+    <div class="step" data-section="ir">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Build an automated IR playbook</h3>
+      <p>GuardDuty finding → EventBridge → Lambda → auto-isolate + snapshot + notify.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Lambda IR</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="cm"># EventBridge rule → Lambda → auto-remediation</span>
+<span class="pr">$</span> <span class="cmd">cat &gt; ir-lambda.py &lt;&lt; 'EOF'</span>
+<span class="cmd">import boto3</span>
+<span class="cmd"></span>
+<span class="cmd">def handler(event, context):</span>
+<span class="cmd">    finding = event['detail']</span>
+<span class="cmd">    severity = finding['severity']</span>
+<span class="cmd">    resource = finding['resource']['instanceDetails']['instanceId']</span>
+<span class="cmd">    </span>
+<span class="cmd">    ec2 = boto3.client('ec2')</span>
+<span class="cmd">    </span>
+<span class="cmd">    # Isolate the instance</span>
+<span class="cmd">    ec2.modify_instance_attribute(</span>
+<span class="cmd">        InstanceId=resource,</span>
+<span class="cmd">        Groups=['sg-quarantine']  # Empty SG = no network access</span>
+<span class="cmd">    )</span>
+<span class="cmd">    </span>
+<span class="cmd">    # Snapshot for forensics</span>
+<span class="cmd">    volumes = ec2.describe_volumes(</span>
+<span class="cmd">        Filters=[{'Name': 'attachment.instance-id', 'Values': [resource]}]</span>
+<span class="cmd">    )</span>
+<span class="cmd">    for vol in volumes['Volumes']:</span>
+<span class="cmd">        ec2.create_snapshot(</span>
+<span class="cmd">            VolumeId=vol['VolumeId'],</span>
+<span class="cmd">            Description=f'IR snapshot - {resource}'</span>
+<span class="cmd">        )</span>
+<span class="cmd">    </span>
+<span class="cmd">    return {'status': 'isolated', 'instance': resource}</span>
+<span class="cmd">EOF</span></pre></div>
+      </div>
+    </div>
+    <div class="nav-footer">
+      <button class="nav-btn" onclick="goToSection('stride')">← PREV LAB</button>
+      <button class="nav-btn primary" onclick="goToSection('monitoring')">NEXT LAB →</button>
+    </div>
+  </div>
+  <div class="section-content " id="sec-monitoring">
+    <div class="section-header">
+      <h2>Lab 4: Security Monitoring & Dashboards</h2>
+      <div class="meta">~60 min</div>
+    </div>
+    
+    <div class="step" data-section="monitoring">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Deploy Prometheus + Grafana</h3>
+      <p>Centralized metrics and dashboards for security monitoring.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">Monitoring stack</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">helm repo add prometheus-community https://prometheus-community.github.io/helm-charts</span>
+<span class="pr">$</span> <span class="cmd">helm install prometheus prometheus-community/kube-prometheus-stack \</span>
+<span class="cmd">    --namespace monitoring --create-namespace</span>
+<span class="cmd"></span>
+<span class="cm"># Access Grafana</span>
+<span class="pr">$</span> <span class="cmd">kubectl port-forward svc/prometheus-grafana 3000:80 -n monitoring</span>
+<span class="cm"># Open http://localhost:3000 (admin/prom-operator)</span></pre></div>
+      </div>
+    </div>
+    <div class="nav-footer">
+      <button class="nav-btn" onclick="goToSection('ir')">← PREV LAB</button>
+      <button class="nav-btn primary" onclick="goToSection('automation')">NEXT LAB →</button>
+    </div>
+  </div>
+  <div class="section-content " id="sec-automation">
+    <div class="section-header">
+      <h2>Lab 5: Security Automation Framework</h2>
+      <div class="meta">~60 min</div>
+    </div>
+    
+    <div class="step" data-section="automation">
+      <h3><span class="step-check" onclick="toggleStep(this)"></span>Create security-as-code repo</h3>
+      <p>All security policies as code, version controlled, reviewed, and auto-deployed.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-label">GitOps</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
+        <div class="code-body"><pre><span class="pr">$</span> <span class="cmd">mkdir -p security-policies/{opa,falco,network-policies,config-rules}</span>
+<span class="cmd"></span>
+<span class="cm"># All policies live in git</span>
+<span class="cm"># ArgoCD syncs them to the cluster automatically</span>
+<span class="cm"># Changes require PR review from security team</span>
+<span class="cm"># Unit tests validate policies before deployment</span>
+<span class="cmd"></span>
+<span class="pr">$</span> <span class="cmd">cat &gt; security-policies/README.md &lt;&lt; 'EOF'</span>
+<span class="cm"># Security Policy Repository</span>
+<span class="cmd">## Structure</span>
+<span class="cmd">- opa/ — Gatekeeper constraint templates</span>
+<span class="cmd">- falco/ — Runtime detection rules  </span>
+<span class="cmd">- network-policies/ — Namespace segmentation</span>
+<span class="cmd">- config-rules/ — AWS Config compliance rules</span>
+<span class="cmd">EOF</span></pre></div>
+      </div>
+    </div>
+    <div class="nav-footer">
+      <button class="nav-btn" onclick="goToSection('monitoring')">← PREV LAB</button>
+      <a class="nav-btn primary" href="Week8_Labs.html">NEXT: WEEK 8 →</a>
+    </div>
+  </div>
+</div>
+<script>
+const sections = ["zero-trust", "stride", "ir", "monitoring", "automation"];
+document.querySelectorAll('.sec-tab').forEach(tab => {
+  tab.addEventListener('click', () => goToSection(tab.dataset.sec));
+});
+function goToSection(sec) {
+  document.querySelectorAll('.sec-tab').forEach(t => t.classList.toggle('active', t.dataset.sec === sec));
+  document.querySelectorAll('.section-content').forEach(c => c.classList.toggle('active', c.id === 'sec-' + sec));
+  window.scrollTo({ top: 280, behavior: 'smooth' });
+}
+function toggleStep(el) {
+  el.classList.toggle('done');
+  el.textContent = el.classList.contains('done') ? '✓' : '';
+  el.closest('.step').classList.toggle('completed');
+  updateProgress(); updateSectionTabs();
+}
+function updateProgress() {
+  const total = document.querySelectorAll('.step-check').length;
+  const done = document.querySelectorAll('.step-check.done').length;
+  document.getElementById('progressFill').style.width = (total > 0 ? (done/total)*100 : 0) + '%';
+  document.getElementById('progressText').textContent = done + ' of ' + total + ' steps completed' + (done === total && total > 0 ? ' — WEEK 7 COMPLETE' : '');
+}
+function updateSectionTabs() {
+  sections.forEach(sec => {
+    const steps = document.querySelectorAll('.step[data-section="'+sec+'"] .step-check');
+    const done = document.querySelectorAll('.step[data-section="'+sec+'"] .step-check.done');
+    const tab = document.querySelector('.sec-tab[data-sec="'+sec+'"]');
+    if (steps.length > 0 && done.length === steps.length) tab.classList.add('completed');
+    else tab.classList.remove('completed');
+  });
+}
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.textContent.replace(/COPY$/, '').trim()).then(() => {
+    btn.textContent = 'COPIED'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+updateProgress();
+</script>
+</body>
+</html>
