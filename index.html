@@ -4,51 +4,458 @@
   <meta charset="UTF-8">
   <title>RapidCyberAI - Training Portal</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #0b0f19;
-      color: #ffffff;
-      text-align: center;
-      padding: 40px;
+    :root {
+      --blood: #8B0000;
+      --crimson: #DC143C;
+      --scarlet: #FF2D2D;
+      --void: #0A0A0A;
+      --carbon: #111;
+      --steel: #1A1A1A;
+      --ash: #222;
+      --slate: #2A2A2A;
+      --smoke: #888;
+      --bone: #CCC;
+      --text: #E0E0E0;
+      --white: #F5F5F5;
+      --accent: #00D4AA;
+      --warn: #F59E0B;
+      --info: #3B82F6;
+      --success: #10B981;
     }
-    h1 {
-      color: #00ffc3;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--void);
+      color: var(--text);
+      line-height: 1.7;
+    }
+    .header {
+      background: var(--carbon);
+      border-bottom: 2px solid var(--blood);
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand svg {
+      width: 32px;
+      height: 32px;
+    }
+    .brand span {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--crimson);
+      letter-spacing: 2px;
+    }
+    .header-meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--smoke);
+      letter-spacing: 1px;
     }
     .container {
-      max-width: 800px;
-      margin: auto;
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
     }
-    .lab-link {
-      display: block;
-      margin: 10px 0;
-      padding: 15px;
-      background: #111827;
-      border-radius: 8px;
+    .hero {
+      text-align: center;
+      padding: 2.5rem 0;
+      border-bottom: 1px solid var(--ash);
+      margin-bottom: 2rem;
+    }
+    .hero-badge {
+      display: inline-block;
+      padding: 4px 14px;
+      border: 1px solid var(--blood);
+      border-radius: 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--crimson);
+      letter-spacing: 2px;
+      margin-bottom: 1rem;
+    }
+    .hero h1 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 32px;
+      color: var(--white);
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+    .hero h1 span {
+      color: var(--crimson);
+    }
+    .hero .sub {
+      font-size: 14px;
+      color: var(--smoke);
+      max-width: 640px;
+      margin: 0 auto;
+    }
+    .hero .time {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 1rem;
+      padding: 8px 18px;
+      background: var(--steel);
+      border-radius: 999px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--bone);
+    }
+    .hero .time .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--crimson);
+    }
+    .progress-wrap { width: 100%; background: var(--ash); height: 3px; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--blood), var(--crimson)); width: 11%; transition: width 0.6s ease; }
+    .progress-text { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--smoke); text-align: center; padding: 6px 0; background: var(--carbon); border-bottom: 1px solid var(--ash); margin-bottom: 2rem; }
+    .section-nav { display: flex; gap: 4px; margin-bottom: 2rem; flex-wrap: wrap; background: var(--carbon); padding: 6px; border-radius: 6px; border: 1px solid var(--ash); }
+    .sec-tab { flex: 1; min-width: 100px; padding: 8px 10px; background: transparent; border: none; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--smoke); cursor: pointer; transition: all 0.2s; letter-spacing: 0.5px; text-align: center; }
+    .sec-tab:hover { background: var(--steel); color: var(--bone); }
+    .sec-tab.active { background: var(--blood); color: white; }
+    .sec-tab .tab-check { display: inline-block; margin-right: 4px; opacity: 0; transition: opacity 0.3s; }
+    .sec-tab.completed .tab-check { opacity: 1; color: var(--accent); }
+    .section-content { display: none; }
+    .section-content.active { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .section-header { margin-bottom: 1.5rem; }
+    .section-header h2 { font-family: 'JetBrains Mono', monospace; font-size: 18px; color: var(--crimson); font-weight: 700; margin-bottom: 0.25rem; }
+    .section-header .meta { font-size: 13px; color: var(--smoke); }
+    .step { margin-bottom: 1.5rem; border-left: 2px solid var(--ash); padding-left: 1.25rem; position: relative; transition: all 0.3s; }
+    .step::before { content: ''; position: absolute; left: -6px; top: 8px; width: 10px; height: 10px; background: var(--blood); border-radius: 50%; border: 2px solid var(--void); transition: all 0.3s; }
+    .step h3 { font-family: 'JetBrains Mono', monospace; font-size: 14px; color: var(--white); font-weight: 600; margin-bottom: 0.4rem; }
+    .step p { font-size: 13px; color: var(--smoke); margin-bottom: 0; }
+    .code-block {
+      background: var(--void);
+      border: 1px solid var(--ash);
+      border-radius: 6px;
+      margin: 1rem 0;
+      overflow: hidden;
+    }
+    .code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      background: var(--steel);
+      border-bottom: 1px solid var(--ash);
+    }
+    .code-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--smoke);
+      letter-spacing: 1px;
+    }
+    .copy-btn {
+      background: var(--ash);
+      border: 1px solid #333;
+      color: var(--smoke);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 1px;
+    }
+    .copy-btn:hover { background: var(--blood); border-color: var(--blood); color: white; }
+    .copy-btn.copied { background: var(--accent); border-color: var(--accent); color: var(--void); }
+    .code-body { padding: 1rem; overflow-x: auto; }
+    .code-body pre { font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
+    .week-grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      margin-top: 2rem;
+    }
+    .week-card {
+      background: var(--carbon);
+      border: 1px solid var(--ash);
+      border-radius: 14px;
+      padding: 1.25rem;
       text-decoration: none;
-      color: white;
-      transition: 0.2s;
+      color: inherit;
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
     }
-    .lab-link:hover {
-      background: #1f2937;
+    .week-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--crimson);
+      background: #14141f;
+    }
+    .week-card h2 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 16px;
+      color: var(--white);
+      margin-bottom: 0.5rem;
+    }
+    .week-card p {
+      font-size: 13px;
+      color: var(--smoke);
+      line-height: 1.6;
+    }
+    .week-card .label {
+      display: inline-flex;
+      margin-top: 1rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #16161f;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 1px;
+      color: var(--accent);
+    }
+    .nav-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 2rem;
+      border-top: 1px solid var(--ash);
+      margin-top: 2rem;
+    }
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      background: var(--steel);
+      border: 1px solid var(--ash);
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--bone);
+      text-decoration: none;
+      transition: all 0.2s;
+      letter-spacing: 1px;
+    }
+    .nav-btn:hover { border-color: var(--crimson); color: var(--crimson); }
+    .nav-btn.primary { background: var(--blood); border-color: var(--blood); color: white; }
+    .nav-btn.primary:hover { background: var(--crimson); border-color: var(--crimson); }
+    .footer-note {
+      margin-top: 2rem;
+      font-size: 13px;
+      color: var(--smoke);
+      text-align: center;
+    }
+    @media (max-width: 640px) {
+      .container { padding: 1rem; }
+      .hero h1 { font-size: 26px; }
+      .week-card { padding: 1rem; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>RapidCyberAI Training Portal</h1>
-    <p>Select a lab to begin:</p>
-
-    <a class="lab-link" href="Week0_Environment_Setup_Lab.html">Week 0 - Environment Setup</a>
-    <a class="lab-link" href="Week1_Labs.html">Week 1 - Labs</a>
-    <a class="lab-link" href="Week2_Labs.html">Week 2 - Labs</a>
-    <a class="lab-link" href="Week3_Labs.html">Week 3 - Labs</a>
-    <a class="lab-link" href="Week4_Labs.html">Week 4 - Labs</a>
-    <a class="lab-link" href="Week5_Labs.html">Week 5 - Labs</a>
-    <a class="lab-link" href="Week6_Labs.html">Week 6 - Labs</a>
-    <a class="lab-link" href="Week7_Labs.html">Week 7 - Labs</a>
-    <a class="lab-link" href="Week8_Labs.html">Week 8 - Labs</a>
-
+  <div class="header">
+    <div class="brand">
+      <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+        <path d="M28 4 L52 16 L52 40 L28 52 L4 40 L4 16 Z" fill="none" stroke="#DC143C" stroke-width="2"/>
+        <path d="M28 8 L48 18 L48 38 L28 48 L8 38 L8 18 Z" fill="#8B0000" opacity="0.3"/>
+        <circle cx="28" cy="20" r="3" fill="#DC143C"/>
+        <circle cx="20" cy="30" r="2.5" fill="#DC143C" opacity="0.7"/>
+        <circle cx="36" cy="30" r="2.5" fill="#DC143C" opacity="0.7"/>
+        <circle cx="28" cy="37" r="2.5" fill="#DC143C" opacity="0.8"/>
+        <line x1="28" y1="20" x2="20" y2="30" stroke="#DC143C" stroke-width="0.7" opacity="0.4"/>
+        <line x1="28" y1="20" x2="36" y2="30" stroke="#DC143C" stroke-width="0.7" opacity="0.4"/>
+        <line x1="20" y1="30" x2="28" y2="37" stroke="#DC143C" stroke-width="0.7" opacity="0.4"/>
+        <line x1="36" y1="30" x2="28" y2="37" stroke="#DC143C" stroke-width="0.7" opacity="0.4"/>
+        <rect x="24" y="42" width="8" height="2" fill="#DC143C" opacity="0.8"/>
+      </svg>
+      <span>RAPID CYBER AI</span>
+    </div>
+    <span class="header-meta">PORTAL • 9 PAGES</span>
   </div>
+
+  <div class="container">
+    <div class="hero">
+      <div class="hero-badge">TRAINING PORTAL</div>
+      <h1>RapidCyberAI <span>Lab Index</span></h1>
+      <p class="sub">Browse each week’s lab with the same premium training format used across all modules.</p>
+      <div class="time"><span class="dot"></span> Designed to match weekly lab page styling</div>
+    </div>
+
+    <div class="progress-wrap"><div class="progress-fill"></div></div>
+    <div class="progress-text">1 of 9 portal pages ready</div>
+
+    <div class="section-nav">
+      <button class="sec-tab active" data-sec="overview"><span class="tab-check">✓</span>Overview</button>
+      <button class="sec-tab" data-sec="weeks"><span class="tab-check">✓</span>Weeks</button>
+      <button class="sec-tab" data-sec="resources"><span class="tab-check">✓</span>Resources</button>
+    </div>
+
+    <div class="section-content active" id="sec-overview">
+      <div class="week-grid">
+        <a class="week-card" href="Week0_Environment_Setup_Lab.html">
+          <h2>Week 0</h2>
+          <p>Environment Setup — install tools, configure your workspace, and verify the lab environment.</p>
+          <span class="label">START HERE</span>
+        </a>
+        <a class="week-card" href="Week1_Labs.html">
+          <h2>Week 1</h2>
+          <p>AWS Security Fundamentals — secure AWS identity, networking, logging, and detection.</p>
+          <span class="label">FOUNDATION</span>
+        </a>
+        <a class="week-card" href="Week2_Labs.html">
+          <h2>Week 2</h2>
+          <p>Week 2 labs — continue the training path with advanced security practice and exercises.</p>
+          <span class="label">LABS</span>
+        </a>
+        <a class="week-card" href="Week3_Labs.html">
+          <h2>Week 3</h2>
+          <p>Week 3 labs — follow the same styled portal navigation to open the next training chapter.</p>
+          <span class="label">LABS</span>
+        </a>
+        <a class="week-card" href="Week4_Labs.html">
+          <h2>Week 4</h2>
+          <p>Week 4 labs — access the next stage of your RapidCyberAI training experience.</p>
+          <span class="label">LABS</span>
+        </a>
+        <a class="week-card" href="Week5_Labs.html">
+          <h2>Week 5</h2>
+          <p>Week 5 labs — keep the same layout and navigation model across your learning path.</p>
+          <span class="label">LABS</span>
+        </a>
+        <a class="week-card" href="Week6_Labs.html">
+          <h2>Week 6</h2>
+          <p>Week 6 labs — continue through the course with consistent structure and styling.</p>
+          <span class="label">LABS</span>
+        </a>
+        <a class="week-card" href="Week7_Labs.html">
+          <h2>Week 7</h2>
+          <p>Week 7 labs — stay on the same themed portal for every week of the training.</p>
+          <span class="label">LABS</span>
+        </a>
+        <a class="week-card" href="Week8_Labs.html">
+          <h2>Week 8</h2>
+          <p>Week 8 labs — finish strong with the same polished lab experience across the repo.</p>
+          <span class="label">LABS</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="section-content" id="sec-weeks">
+      <div class="section-header">
+        <h2>Weekly Overview</h2>
+        <div class="meta">All weeks in one place for fast navigation.</div>
+      </div>
+      <div class="week-grid">
+        <a class="week-card" href="Week0_Environment_Setup_Lab.html">
+          <h2>Week 0</h2>
+          <p>Prep your environment with the same dark portal style used across the course.</p>
+          <span class="label">SETUP</span>
+        </a>
+        <a class="week-card" href="Week1_Labs.html">
+          <h2>Week 1</h2>
+          <p>Hands-on AWS security labs designed for rapid skill-building.</p>
+          <span class="label">SECURITY</span>
+        </a>
+        <a class="week-card" href="Week2_Labs.html">
+          <h2>Week 2</h2>
+          <p>Deepen network and cloud security fundamentals in week 2.</p>
+          <span class="label">NETWORK</span>
+        </a>
+        <a class="week-card" href="Week3_Labs.html">
+          <h2>Week 3</h2>
+          <p>Continue your training path with additional lab scenarios.</p>
+          <span class="label">BUILD</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="section-content" id="sec-resources">
+      <div class="section-header">
+        <h2>Resources</h2>
+        <div class="meta">Useful links and support notes for the training portal.</div>
+      </div>
+      <div class="step">
+        <h3>Getting started</h3>
+        <p>Use the lab cards to open each week. The training portal follows the same layout as the lab pages for consistency.</p>
+      </div>
+      <div class="step">
+        <h3>Environment guidance</h3>
+        <p>If the page fails to load, verify your browser can access the local repo or remote site and that the files are named exactly as shown.</p>
+      </div>
+      <div class="step">
+        <h3>Navigation</h3>
+        <p>Click the section tabs to switch between the portal overview, weekly navigation, and resources.</p>
+      </div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-label">Example: Launch portal</span>
+          <button class="copy-btn" onclick="copyCode(this)">COPY</button>
+        </div>
+        <div class="code-body"><pre>git clone https://github.com/NotchSNCO/rapidcyberai.com-site.git
+cd "rapidcyberai.com-site"
+# Open index.html in your browser or deploy to Netlify</pre></div>
+      </div>
+    </div>
+
+    <div class="nav-footer">
+      <div></div>
+      <a class="nav-btn primary" href="Week0_Environment_Setup_Lab.html">BEGIN WEEK 0 →</a>
+    </div>
+
+    <p class="footer-note">Each week uses the same page layout, fonts, and dark cyber training theme for consistency.</p>
+  </div>
+  <script>
+    const tabs = document.querySelectorAll('.sec-tab');
+    const sections = document.querySelectorAll('.section-content');
+    const progressFill = document.querySelector('.progress-fill');
+    const progressText = document.querySelector('.progress-text');
+
+    function setActiveSection(targetId) {
+      tabs.forEach(tab => {
+        const isActive = tab.dataset.sec === targetId;
+        tab.classList.toggle('active', isActive);
+      });
+      sections.forEach(section => {
+        section.classList.toggle('active', section.id === `sec-${targetId}`);
+      });
+      updateProgress(targetId);
+    }
+
+    function updateProgress(targetId) {
+      const index = [...sections].findIndex(section => section.id === `sec-${targetId}`) + 1;
+      const total = sections.length;
+      if (progressFill) progressFill.style.width = `${Math.round((index / total) * 100)}%`;
+      if (progressText) progressText.textContent = `${index} of ${total} portal pages ready`;
+    }
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => setActiveSection(tab.dataset.sec));
+    });
+
+    if (tabs.length > 0) {
+      setActiveSection('overview');
+    }
+
+    function copyCode(button) {
+      const code = button.closest('.code-block').querySelector('pre').innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        button.classList.add('copied');
+        button.textContent = 'COPIED';
+        setTimeout(() => {
+          button.classList.remove('copied');
+          button.textContent = 'COPY';
+        }, 1500);
+      });
+    }
+  </script>
 </body>
 </html>
