@@ -125,7 +125,6 @@ body { font-family: 'DM Sans', sans-serif; background: var(--void); color: var(-
 .step-check:hover { border-color: var(--crimson); }
 .step-check.done { background: var(--accent); border-color: var(--accent); color: var(--void); }
 .step p { font-size: 13px; color: var(--smoke); margin-bottom: 0.5rem; }
-.step ol { font-size: 13px; color: var(--smoke); margin-bottom: 0.5rem; }
 .step a { color: var(--crimson); text-decoration: none; border-bottom: 1px solid var(--blood); }
 .step a:hover { color: var(--scarlet); }
 
@@ -259,7 +258,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--void); color: var(-
   <span class="header-meta">PREREQUISITE LAB</span>
 </div>
 <div class="progress-wrap"><div class="progress-fill" id="progressFill"></div></div>
-<div class="progress-text" id="progressText">0 of 20 steps completed</div>
+<div class="progress-text" id="progressText">0 of 18 steps completed</div>
 
 <!-- Main -->
 <div class="container">
@@ -269,35 +268,6 @@ body { font-family: 'DM Sans', sans-serif; background: var(--void); color: var(-
     <h1>Week 0: <span>Environment Setup</span></h1>
     <p class="sub">Install and configure every tool you'll use across the 8-week bootcamp. Complete all steps below before starting Lab 1.</p>
     <div class="time-est"><span class="dot"></span> Estimated time: 45–60 minutes</div>
-  </div>
-
-  <!-- ═══════════════════════════════════════ -->
-  <!-- AI & SECURITY FOCUS (NEW) -->
-  <!-- ═══════════════════════════════════════ -->
-  <div style="background: var(--steel); border: 1px solid var(--ash); border-radius: 8px; padding: 1.25rem; margin-bottom: 2rem;">
-    <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); letter-spacing: 2px; font-weight: 700; margin-bottom: 0.75rem;">
-      AI & SECURITY FOCUS THIS WEEK
-    </div>
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 13px; color: var(--smoke);">
-      <div>
-        <div style="color: var(--bone); font-weight: 600; margin-bottom: 0.25rem;">AI Concepts</div>
-        <ul style="margin: 0; padding-left: 1.25rem; line-height: 1.6;">
-          <li>System vs user prompts</li>
-          <li>Safe AI tool configuration</li>
-        </ul>
-      </div>
-      <div>
-        <div style="color: var(--bone); font-weight: 600; margin-bottom: 0.25rem;">Security Concepts</div>
-        <ul style="margin: 0; padding-left: 1.25rem; line-height: 1.6;">
-          <li>Data classification for AI</li>
-          <li>Secrets hygiene with LLMs</li>
-        </ul>
-      </div>
-    </div>
-    <div class="callout callout-blood" style="margin-top: 1rem; margin-bottom: 0;">
-      <div class="cl-label">REFLECTION QUESTION</div>
-      <p>How could an attacker abuse an AI tool that has access to your cloud credentials or internal logs?</p>
-    </div>
   </div>
 
   <!-- OS Toggle (global) -->
@@ -368,71 +338,12 @@ body { font-family: 'DM Sans', sans-serif; background: var(--void); color: var(-
       </div>
     </div>
 
-    <div class="step" data-section="aws">
-      <h3><span class="step-check" onclick="toggleStep(this)"></span>Configure a secure AI helper for labs</h3>
-      <p>Throughout this bootcamp, you'll use an AI assistant (ChatGPT, Claude, or similar) to help debug errors, explain concepts, and draft configurations. Set it up safely now.</p>
-      <p><strong>Task:</strong></p>
-      <ol style="font-size: 13px; color: var(--smoke); padding-left: 1.5rem; margin: 0.5rem 0;">
-        <li>Create a free account on your chosen AI platform (ChatGPT, Claude, Gemini, etc.).</li>
-        <li>In your first message, paste this system-level instruction:</li>
-      </ol>
-      <div class="code-block">
-        <div class="code-header"><span class="code-label">AI HELPER SYSTEM PROMPT</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
-        <div class="code-body">
-<pre><span class="str">You are my secure cloud security tutor for an 8-week bootcamp. 
-Never ask me to paste API keys, AWS credentials, or internal hostnames. 
-If I accidentally paste secrets, remind me to rotate them immediately. 
-Explain concepts clearly and point out security risks in any code or config I show you.</span></pre>
-        </div>
-      </div>
-      <div class="callout callout-info">
-        <div class="cl-label">AI FUNDAMENTALS</div>
-        <p><strong>System prompt</strong> = instructions the AI follows across the entire conversation.<br>
-        <strong>User prompt</strong> = each individual question you ask.<br>
-        By setting a security-focused system prompt, you reduce the risk of accidentally leaking sensitive data.</p>
-      </div>
-    </div>
-
-    <div class="step" data-section="aws">
-      <h3><span class="step-check" onclick="toggleStep(this)"></span>Document your AI acceptable-use policy</h3>
-      <p>AI tools can accelerate learning, but they can also leak data if you're not careful. Define your personal rules now.</p>
-      <p><strong>Task:</strong> Create a file called <code>ai-use-policy.md</code> in your bootcamp notes folder (or a section in your README) with these three rules:</p>
-      <div class="code-block">
-        <div class="code-header"><span class="code-label">AI ACCEPTABLE USE POLICY (TEMPLATE)</span><button class="copy-btn" onclick="copyCode(this)">COPY</button></div>
-        <div class="code-body">
-<pre><span class="cm"># AI Acceptable Use Policy</span>
-
-<span class="fl">## I will NEVER paste into AI tools:</span>
-- AWS Access Keys or Secret Keys
-- Customer data or PII
-- Internal IP addresses or hostnames
-- Proprietary company code (if working professionally)
-
-<span class="fl">## I CAN paste into AI tools:</span>
-- Sanitized logs (with IPs/IDs removed)
-- Public documentation or error messages
-- Generic configuration templates
-
-<span class="fl">## If I accidentally paste a secret:</span>
-1. Rotate the credential immediately via AWS Console
-2. Delete the AI conversation thread
-3. Document the incident in my lab notes</pre>
-        </div>
-      </div>
-      <div class="callout callout-warn">
-        <div class="cl-label">AI SECURITY PRINCIPLE</div>
-        <p>AI providers may use your inputs to improve their models. Even if they promise not to, treat every prompt as potentially logged or reviewed by humans. <strong>Data classification</strong> (public vs internal vs secret) is a core security practice that applies to AI tools just like any other third-party service.</p>
-      </div>
-    </div>
-
     <div class="checkpoint">
       <div class="cp-label">SECTION CHECKPOINT</div>
       <ul>
         <li>AWS Free Tier account created and verified</li>
         <li>MFA enabled on root account</li>
         <li>IAM admin user created with access key downloaded</li>
-        <li>AI helper configured with security-focused system prompt</li>
-        <li>AI acceptable-use policy documented in notes</li>
       </ul>
     </div>
 
@@ -910,7 +821,7 @@ sudo apt update && sudo apt install -y trivy</span>
 
     <div class="nav-footer">
       <button class="nav-btn" onclick="goToSection('k8s')">← KUBECTL</button>
-      <a class="nav-btn primary" href="Week1_Interactive_Lab_Portal.html">START WEEK 1 →</a>
+      <a class="nav-btn primary" href="/week1_labs">START WEEK 1 →</a>
     </div>
   </div>
 
