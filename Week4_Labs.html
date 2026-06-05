@@ -66,6 +66,59 @@ body { font-family: 'DM Sans', sans-serif; background: var(--void); color: var(-
 .nav-btn.primary { background: var(--blood); border-color: var(--blood); color: white; }
 .nav-btn.primary:hover { background: var(--crimson); border-color: var(--crimson); }
 @media (max-width: 640px) { .container { padding: 1rem; } .section-nav { flex-direction: column; } .hero h1 { font-size: 20px; } }
+
+.week-jumper {
+  background: var(--carbon);
+  border-bottom: 1px solid var(--ash);
+  padding: 6px 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 56px;
+  z-index: 99;
+  overflow-x: auto;
+}
+.week-jumper .wj-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--smoke);
+  letter-spacing: 2px;
+  white-space: nowrap;
+  padding-right: 6px;
+  border-right: 1px solid var(--ash);
+  margin-right: 4px;
+}
+.wj-btn {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--smoke);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  padding: 3px 7px;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.15s;
+  letter-spacing: 0.5px;
+}
+.wj-btn:hover {
+  background: var(--steel);
+  color: var(--bone);
+  border-color: var(--ash);
+}
+.wj-btn.current {
+  background: var(--blood);
+  color: white;
+  border-color: var(--blood);
+}
+@media (max-width: 640px) {
+  .week-jumper { top: 52px; gap: 2px; padding: 4px 0.75rem; }
+  .wj-btn { font-size: 8px; padding: 2px 5px; }
+}
+
 </style>
 </head>
 <body>
@@ -78,6 +131,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--void); color: var(-
 </div>
 <div class="progress-wrap"><div class="progress-fill" id="progressFill"></div></div>
 <div class="progress-text" id="progressText">0 steps completed</div>
+<div class="week-jumper"><span class="wj-label">JUMP TO</span><a class="wj-btn" href="/week0_environment_setup_lab">W0:SETUP</a><a class="wj-btn" href="/week1_labs">W1:AWS</a><a class="wj-btn" href="/week2_labs">W2:TERRAFORM</a><a class="wj-btn" href="/week3_labs">W3:DOCKER</a><a class="wj-btn current" href="/week4_labs">W4:K8S</a><a class="wj-btn" href="/week5_labs">W5:CI/CD</a><a class="wj-btn" href="/week6_labs">W6:EKS</a><a class="wj-btn" href="/week7_labs">W7:ADVANCED</a><a class="wj-btn" href="/week8_labs">W8:CAPSTONE</a></div>
 <div class="container">
   <div class="hero">
     <div class="hero-badge">WEEK 4</div>
